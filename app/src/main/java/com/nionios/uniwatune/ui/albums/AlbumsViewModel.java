@@ -10,7 +10,7 @@ public class AlbumsViewModel extends ViewModel {
 
     public AlbumsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is albums fragment");
+        mText.setValue("No albums here yet.");
     }
 
     public LiveData<String> getText() {
