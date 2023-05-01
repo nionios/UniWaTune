@@ -56,7 +56,6 @@ public class TransformFragment extends Fragment {
 
     private static class TransformAdapter extends ListAdapter<String, TransformViewHolder> {
 
-
         private final List<Integer> drawables = Arrays.asList(
                 R.drawable.avatar_1,
                 R.drawable.avatar_2,

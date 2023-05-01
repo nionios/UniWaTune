@@ -1,5 +1,6 @@
 package com.nionios.uniwatune;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -16,7 +17,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.nionios.uniwatune.data.helpers.fileFinder;
+import com.nionios.uniwatune.data.singletons.AudioScanned;
+import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.ActivityMainBinding;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Get instance of our singleton where the list of all audio files found is stored
+        AudioScanned audioScannedMainActInstance = AudioScanned.getInstance();
+        fileFinder localFileFinder = new fileFinder();
+
+        List<AudioFile> tempAudioFile = localFileFinder.getAllAudioFromDevice(this.getApplicationContext());
+        audioScannedMainActInstance.setAudioFileList(tempAudioFile);
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

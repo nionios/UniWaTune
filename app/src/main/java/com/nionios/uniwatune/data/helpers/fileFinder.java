@@ -11,11 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class fileFinder {
+    /**
+     * {@code @description} Function to make and organize audioFile objects with the audio file info
+     * from the device into a list.
+     * */
     public List<AudioFile> getAllAudioFromDevice(final Context context) {
 
         final List<AudioFile> AudioFileList = new ArrayList<>();
 
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        /* Projection to search with specific columns with cursor later */
         String[] projection = {
                 MediaStore.Audio.AudioColumns.DATA,
                 MediaStore.Audio.AudioColumns.TITLE,
@@ -26,25 +31,27 @@ public class fileFinder {
         // if want from specific folder
         //Cursor c = context.getContentResolver().query(uri, projection, MediaStore.Audio.Media.DATA + " like ? ", new String[]{"%utm%"}, null);
 
-        // if want fetch all files
-        Cursor c = context.getContentResolver().query(uri,
+        /* Fetch all files from internal storage with the columns described in projection */
+        Cursor audioCursor = context.getContentResolver().query(
+                uri,
                 projection,
                 null,
                 null,
-                null);
+                null
+        );
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                String path = c.getString(0);
-                String name = c.getString(1);
-                String album = c.getString(2);
-                String artist = c.getString(3);
+        if (audioCursor != null) {
+            while (audioCursor.moveToNext()) {
+                /* Get the desired strings and make a new AudioFile obj with the info */
+                String path   = audioCursor.getString(0);
+                String name   = audioCursor.getString(1);
+                String album  = audioCursor.getString(2);
+                String artist = audioCursor.getString(3);
 
                 AudioFile AudioFile = new AudioFile(path,name,album,artist);
-
                 AudioFileList.add(AudioFile);
             }
-            c.close();
+            audioCursor.close();
         }
         return AudioFileList;
     }
