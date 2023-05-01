@@ -56,6 +56,7 @@ public class TransformFragment extends Fragment {
 
     private static class TransformAdapter extends ListAdapter<String, TransformViewHolder> {
 
+        // TODO: dark mode is still black, change color
         private final List<Integer> drawables = Arrays.asList(
                 R.drawable.baseline_audio_file_24);
 
@@ -82,7 +83,9 @@ public class TransformFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull TransformViewHolder holder, int position) {
-            holder.textView.setText(getItem(position));
+            holder.titleTextView.setText(getItem(position));
+            holder.artistNameTextView.setText(getItem(position));
+            holder.albumNameTextView.setText(getItem(position));
             holder.imageView.setImageDrawable(
                     // TODO: based on the file extension, make this icon different
                     //       See drawables above too!
@@ -98,13 +101,17 @@ public class TransformFragment extends Fragment {
     private static class TransformViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView imageView;
-        private final TextView textView;
+        private final TextView artistNameTextView;
+        private final TextView albumNameTextView;
+        private final TextView titleTextView;
 
         public TransformViewHolder(ItemTransformBinding binding) {
             super(binding.getRoot());
             imageView = binding.imageViewItemTransform;
             // TODO: more info on text like album, creator etc.
-            textView = binding.textViewItemTransform;
+            titleTextView = binding.textViewTitleTranform;
+            artistNameTextView = binding.textViewArtistNameTransform;
+            albumNameTextView = binding.textViewAlbumNameTransform;
         }
     }
 }

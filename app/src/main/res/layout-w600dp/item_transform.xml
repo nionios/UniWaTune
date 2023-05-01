@@ -16,7 +16,7 @@
         tools:src="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/text_view_item_transform"
+        android:id="@+id/text_view_title_tranform"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="@id/image_view_item_transform"
