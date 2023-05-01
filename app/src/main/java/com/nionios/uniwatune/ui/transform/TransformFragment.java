@@ -57,22 +57,7 @@ public class TransformFragment extends Fragment {
     private static class TransformAdapter extends ListAdapter<String, TransformViewHolder> {
 
         private final List<Integer> drawables = Arrays.asList(
-                R.drawable.avatar_1,
-                R.drawable.avatar_2,
-                R.drawable.avatar_3,
-                R.drawable.avatar_4,
-                R.drawable.avatar_5,
-                R.drawable.avatar_6,
-                R.drawable.avatar_7,
-                R.drawable.avatar_8,
-                R.drawable.avatar_9,
-                R.drawable.avatar_10,
-                R.drawable.avatar_11,
-                R.drawable.avatar_12,
-                R.drawable.avatar_13,
-                R.drawable.avatar_14,
-                R.drawable.avatar_15,
-                R.drawable.avatar_16);
+                R.drawable.baseline_audio_file_24);
 
         protected TransformAdapter() {
             super(new DiffUtil.ItemCallback<String>() {
@@ -99,9 +84,14 @@ public class TransformFragment extends Fragment {
         public void onBindViewHolder(@NonNull TransformViewHolder holder, int position) {
             holder.textView.setText(getItem(position));
             holder.imageView.setImageDrawable(
-                    ResourcesCompat.getDrawable(holder.imageView.getResources(),
-                            drawables.get(position),
-                            null));
+                    // TODO: based on the file extension, make this icon different
+                    //       See drawables above too!
+                    ResourcesCompat.getDrawable(
+                            holder.imageView.getResources(),
+                            drawables.get(0),
+                            null
+                    )
+            );
         }
     }
 
@@ -113,6 +103,7 @@ public class TransformFragment extends Fragment {
         public TransformViewHolder(ItemTransformBinding binding) {
             super(binding.getRoot());
             imageView = binding.imageViewItemTransform;
+            // TODO: more info on text like album, creator etc.
             textView = binding.textViewItemTransform;
         }
     }

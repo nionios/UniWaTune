@@ -31,6 +31,12 @@ public class fileFinder {
         // if want from specific folder
         //Cursor c = context.getContentResolver().query(uri, projection, MediaStore.Audio.Media.DATA + " like ? ", new String[]{"%utm%"}, null);
 
+        // Some files might not be music
+        // Enable this for only songs (also add it in the cursor query)
+        // String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+
+        //FIXME: For some reason this ignores Music/
+
         /* Fetch all files from internal storage with the columns described in projection */
         Cursor audioCursor = context.getContentResolver().query(
                 uri,

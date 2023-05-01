@@ -35,8 +35,10 @@ public class MainActivity extends AppCompatActivity {
         AudioScanned audioScannedMainActInstance = AudioScanned.getInstance();
         fileFinder localFileFinder = new fileFinder();
 
-        List<AudioFile> tempAudioFile = localFileFinder.getAllAudioFromDevice(this.getApplicationContext());
-        audioScannedMainActInstance.setAudioFileList(tempAudioFile);
+        // Get the list of our scanned AudioFiles
+        List<AudioFile> localAudioFileList =
+                localFileFinder.getAllAudioFromDevice(this.getApplicationContext());
+        audioScannedMainActInstance.setAudioFileList(localAudioFileList);
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
