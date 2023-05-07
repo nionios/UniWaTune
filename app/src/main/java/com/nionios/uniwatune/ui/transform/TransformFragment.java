@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,10 +17,14 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nionios.uniwatune.R;
+import com.nionios.uniwatune.data.singletons.AudioScanned;
+import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.FragmentTransformBinding;
 import com.nionios.uniwatune.databinding.ItemTransformBinding;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -34,6 +39,7 @@ public class TransformFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        // Get the view model from the source and inflate it
         TransformViewModel transformViewModel =
                 new ViewModelProvider(this).get(TransformViewModel.class);
 
@@ -41,9 +47,19 @@ public class TransformFragment extends Fragment {
         View root = binding.getRoot();
 
         RecyclerView recyclerView = binding.recyclerviewTransform;
-        ListAdapter<String, TransformViewHolder> adapter = new TransformAdapter();
+
+        AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+        ArrayList<AudioFile> localInstanceAudioFileList = localAudioScannedInstance.getAudioFileList();
+
+        ListAdapter<AudioFile, TransformViewHolder> adapter = new TransformAdapter(localInstanceAudioFileList);
+
         recyclerView.setAdapter(adapter);
-        transformViewModel.getTexts().observe(getViewLifecycleOwner(), adapter::submitList);
+        // TODO: Make this receive all info (album name and artist name currently)
+        // TODO: Learn what in the world this thing does and why is it here
+        transformViewModel.getTexts().observe(
+                getViewLifecycleOwner(),
+                adapter::submitList
+        );
         return root;
     }
 
@@ -53,39 +69,61 @@ public class TransformFragment extends Fragment {
         binding = null;
     }
 
+    private static class TransformAdapter extends ListAdapter<AudioFile, TransformViewHolder> {
 
-    private static class TransformAdapter extends ListAdapter<String, TransformViewHolder> {
-
+        private ArrayList<AudioFile> audioFileArrayList;
         // TODO: dark mode is still black, change color
         private final List<Integer> drawables = Arrays.asList(
                 R.drawable.baseline_audio_file_24);
 
-        protected TransformAdapter() {
-            super(new DiffUtil.ItemCallback<String>() {
+        protected TransformAdapter(ArrayList<AudioFile> audioFileArrayList) {
+            super(new DiffUtil.ItemCallback<AudioFile>() {
+                // If and only if items have the same path, then they are the same.
                 @Override
-                public boolean areItemsTheSame(@NonNull String oldItem, @NonNull String newItem) {
-                    return oldItem.equals(newItem);
+                public boolean areItemsTheSame(@NonNull AudioFile oldItem, @NonNull AudioFile newItem) {
+                    return oldItem.getPath().equals(newItem.getPath());
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull String oldItem, @NonNull String newItem) {
-                    return oldItem.equals(newItem);
+                public boolean areContentsTheSame(@NonNull AudioFile oldItem, @NonNull AudioFile newItem) {
+                    return oldItem.getPath().equals(newItem.getPath());
                 }
             });
+            this.audioFileArrayList = audioFileArrayList;
         }
 
         @NonNull
         @Override
         public TransformViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ItemTransformBinding binding = ItemTransformBinding.inflate(LayoutInflater.from(parent.getContext()));
+            ItemTransformBinding binding =
+                    ItemTransformBinding.inflate(LayoutInflater.from(parent.getContext()));
             return new TransformViewHolder(binding);
         }
 
+        /* Called as we are going down the list recycling already created object
+          (memory optimisation, we are loading them as they are in the viewport) */
         @Override
         public void onBindViewHolder(@NonNull TransformViewHolder holder, int position) {
-            holder.titleTextView.setText(getItem(position));
-            holder.artistNameTextView.setText(getItem(position));
-            holder.albumNameTextView.setText(getItem(position));
+            /* Singleton Way (maybe) */
+            // Iterate through audio file list and get their names
+             /*
+            AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+            List<AudioFile> localInstanceAudioFileList = localAudioScannedInstance.getAudioFileList();
+            ArrayList<String> textsToDisplay = new ArrayList<String>();
+
+            holder.titleTextView.setText(localInstanceAudioFileList.get(position).getName());
+            holder.artistNameTextView.setText(localInstanceAudioFileList.get(position).getArtist());
+            holder.albumNameTextView.setText(localInstanceAudioFileList.get(position).getAlbum());
+            */
+             /* Google Way (maybe) */
+            AudioFile AudioFileToDisplay = audioFileArrayList.get(position);
+
+            holder.titleTextView.setText(AudioFileToDisplay.getName());
+            holder.artistNameTextView.setText(AudioFileToDisplay.getArtist());
+            holder.albumNameTextView.setText(AudioFileToDisplay.getAlbum());
+
+            // TODO: tried the following, maybe it does not work
+
             holder.imageView.setImageDrawable(
                     // TODO: based on the file extension, make this icon different
                     //       See drawables above too!
@@ -99,7 +137,6 @@ public class TransformFragment extends Fragment {
     }
 
     private static class TransformViewHolder extends RecyclerView.ViewHolder {
-
         private final ImageView imageView;
         private final TextView artistNameTextView;
         private final TextView albumNameTextView;
@@ -107,8 +144,8 @@ public class TransformFragment extends Fragment {
 
         public TransformViewHolder(ItemTransformBinding binding) {
             super(binding.getRoot());
+            // Set all field bindings
             imageView = binding.imageViewItemTransform;
-            // TODO: more info on text like album, creator etc.
             titleTextView = binding.textViewTitleTranform;
             artistNameTextView = binding.textViewArtistNameTransform;
             albumNameTextView = binding.textViewAlbumNameTransform;

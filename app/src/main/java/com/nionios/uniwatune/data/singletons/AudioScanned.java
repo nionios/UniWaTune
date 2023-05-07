@@ -15,8 +15,26 @@ import java.util.List;
  */
 public class AudioScanned {
     private static AudioScanned INSTANCE;
-    private List<AudioFile> audioFileList;
+    private ArrayList<AudioFile> audioFileList;
     private AudioScanned() {
+        /*
+        // DEBUG: Testing by creating some sample files TODO: Remove this
+        AudioFile s1 = new AudioFile("SampleSongPath",
+                "Sample Song Name",
+                "Sample Artist",
+                "Sample Album");
+        AudioFile s2 = new AudioFile("SampleSongPath", "Death Classic");
+        AudioFile s3 = new AudioFile("SampleSongPath", "Beware", "Death Grips");
+        AudioFile s4 = new AudioFile("SampleSongPath", "This Life", "Denzel Curry");
+
+        List<AudioFile> tempAudioList = new ArrayList<AudioFile>();
+        tempAudioList.add(s1);
+        tempAudioList.add(s2);
+        tempAudioList.add(s3);
+        tempAudioList.add(s4);
+
+        audioFileList = tempAudioList;
+        */
     }
 
     public static AudioScanned getInstance() {
@@ -31,10 +49,10 @@ public class AudioScanned {
         audioFileList.add(inputAudioFile);
     }
 
-    public void setAudioFileList (List<AudioFile> inputAudioFileList) {
+    public void setAudioFileList (ArrayList<AudioFile> inputAudioFileList) {
         audioFileList = inputAudioFileList;
     }
-    public List<AudioFile> getAudioFileList () {
+    public ArrayList<AudioFile> getAudioFileList () {
         return audioFileList;
     }
 }

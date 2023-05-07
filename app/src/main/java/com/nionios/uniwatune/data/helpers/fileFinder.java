@@ -16,9 +16,9 @@ public class fileFinder {
      * {@code @description} Function to make and organize audioFile objects with the audio file info
      * from the device into a list.
      * */
-    public List<AudioFile> getAllAudioFromDevice(final Context context) {
+    public ArrayList<AudioFile> getAllAudioFromDevice(final Context context) {
 
-        final List<AudioFile> AudioFileList = new ArrayList<>();
+        final ArrayList<AudioFile> AudioFileList = new ArrayList<>();
 
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         /* Projection to search with specific columns with cursor later */
@@ -60,7 +60,6 @@ public class fileFinder {
                 /* Get the album art from same folder
                 if (path.)
                 Bitmap albumArt  = context.getContentResolver().loadThumbnail(path);
-
                  */
 
                 AudioFile NewAudioFile;

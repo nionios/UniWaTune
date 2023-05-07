@@ -22,6 +22,7 @@ import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,12 +33,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get instance of our singleton where the list of all audio files found is stored
+
         AudioScanned audioScannedMainActInstance = AudioScanned.getInstance();
         fileFinder localFileFinder = new fileFinder();
 
         // Get the list of our scanned AudioFiles
-        List<AudioFile> localAudioFileList =
+        ArrayList<AudioFile> localAudioFileList =
                 localFileFinder.getAllAudioFromDevice(this.getApplicationContext());
+        // Store it in out singleton with the scanned audio files
         audioScannedMainActInstance.setAudioFileList(localAudioFileList);
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
