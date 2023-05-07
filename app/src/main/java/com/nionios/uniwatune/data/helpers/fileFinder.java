@@ -64,8 +64,8 @@ public class fileFinder {
 
                 AudioFile NewAudioFile;
                 /* Call a different constructor depending on if the info is available */
-                if (artist != "") {
-                    if (album != "") {
+                if (!artist.equals("<unknown>")) {
+                    if (!album.equals("<unknown>")) {
                         if (albumArt != null) {
                             NewAudioFile = new AudioFile(path, name, artist, album, albumArt);
                         } else {
