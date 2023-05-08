@@ -163,7 +163,7 @@ public class TransformFragment extends Fragment {
         public void onClick(View view) {
             NavController navController =
                     Navigation.findNavController(view);
-            navController.navigate(R.id.nav_player);
+            navController.navigate(R.id.action_nav_transform_to_nav_player);
         }
     }
 }
