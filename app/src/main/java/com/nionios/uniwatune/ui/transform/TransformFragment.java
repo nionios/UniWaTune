@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -136,7 +138,11 @@ public class TransformFragment extends Fragment {
         }
     }
 
-    private static class TransformViewHolder extends RecyclerView.ViewHolder {
+    /* TransformViewHolder implements listener to make every song clickable.
+    * Clicking on an item navigates to player*/
+    private static class TransformViewHolder
+            extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
         private final ImageView imageView;
         private final TextView artistNameTextView;
         private final TextView albumNameTextView;
@@ -144,11 +150,20 @@ public class TransformFragment extends Fragment {
 
         public TransformViewHolder(ItemTransformBinding binding) {
             super(binding.getRoot());
+            // Attach the onClick listener
+            binding.getRoot().setOnClickListener(this);
             // Set all field bindings
             imageView = binding.imageViewItemTransform;
             titleTextView = binding.textViewTitleTranform;
             artistNameTextView = binding.textViewArtistNameTransform;
             albumNameTextView = binding.textViewAlbumNameTransform;
+        }
+
+        @Override
+        public void onClick(View view) {
+            NavController navController =
+                    Navigation.findNavController(view);
+            navController.navigate(R.id.nav_player);
         }
     }
 }

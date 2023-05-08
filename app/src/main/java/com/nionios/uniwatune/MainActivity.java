@@ -1,9 +1,9 @@
 package com.nionios.uniwatune;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.Menu;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -23,7 +23,6 @@ import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get instance of our singleton where the list of all audio files found is stored
-
         AudioScanned audioScannedMainActInstance = AudioScanned.getInstance();
         fileFinder localFileFinder = new fileFinder();
 

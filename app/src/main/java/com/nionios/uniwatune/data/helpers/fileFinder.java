@@ -3,6 +3,7 @@ package com.nionios.uniwatune.data.helpers;
 import android.database.Cursor;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.net.Uri;
 
@@ -21,6 +22,15 @@ public class fileFinder {
         final ArrayList<AudioFile> AudioFileList = new ArrayList<>();
 
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        /* TODO: Maybe search downloads too?
+        Uri uri = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            uri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+        }
+
+         */
+
         /* Projection to search with specific columns with cursor later */
         String[] projection = {
                 MediaStore.Audio.AudioColumns.DATA,
