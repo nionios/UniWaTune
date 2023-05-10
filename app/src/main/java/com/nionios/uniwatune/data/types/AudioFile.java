@@ -9,6 +9,8 @@ import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
+import com.nionios.uniwatune.data.singletons.MediaPlayerController;
+
 public class AudioFile {
     @NonNull
     String name;
@@ -82,6 +84,12 @@ public class AudioFile {
         System.out.println("URI:" + Uri.parse(this.getPath()) );
         MediaPlayer localMediaPlayer =
                 MediaPlayer.create( context, Uri.parse(this.getPath()) );
+        /* Switch out any currently playing mediaPlayer with this one if they exist, set this one
+         * as current. */
+        MediaPlayerController localMediaPlayerControllerInstance = MediaPlayerController.getInstance();
+        localMediaPlayerControllerInstance.setMediaPlayer(localMediaPlayer);
+        //Prepare asynchronously so app does not slow down
+      //  localMediaPlayer.prepareAsync();
         //localMediaPlayer.setLooping(true);
         localMediaPlayer.start();
     }
