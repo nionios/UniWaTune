@@ -1,6 +1,11 @@
 package com.nionios.uniwatune.data.types;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
@@ -12,6 +17,8 @@ public class AudioFile {
     String album;
     @NonNull
     String path;
+    // The id is being set once the song is on the AudioScanned List.
+    int ID;
 
     public AudioFile (
             String inputPath,
@@ -68,4 +75,14 @@ public class AudioFile {
     public String getAlbum() {return album;}
     public Bitmap getAlbumArt() {return albumArt;}
     public String getPath() {return path;}
+    public int getID() {return ID;}
+    public void setID(int inputID) {ID = inputID;}
+
+    public void play (Context context) {
+        System.out.println("URI:" + Uri.parse(this.getPath()) );
+        MediaPlayer localMediaPlayer =
+                MediaPlayer.create( context, Uri.parse(this.getPath()) );
+        //localMediaPlayer.setLooping(true);
+        localMediaPlayer.start();
+    }
 }

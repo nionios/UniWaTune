@@ -1,5 +1,6 @@
 package com.nionios.uniwatune;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -26,11 +29,23 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check for READ permission on storage
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_CODE);
+        }
+
         // Get instance of our singleton where the list of all audio files found is stored
         AudioScanned audioScannedMainActInstance = AudioScanned.getInstance();
         fileFinder localFileFinder = new fileFinder();

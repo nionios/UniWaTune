@@ -8,10 +8,12 @@ import android.content.Context;
 import android.provider.MediaStore;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * {@code @description}  Singleton that stores info of the audio files scanned in device.
+ * Every song has its id. The id is being set by this object.
  */
 public class AudioScanned {
     private static AudioScanned INSTANCE;
@@ -51,7 +53,20 @@ public class AudioScanned {
 
     public void setAudioFileList (ArrayList<AudioFile> inputAudioFileList) {
         audioFileList = inputAudioFileList;
+        Iterator<AudioFile> iter = audioFileList.iterator();
+        int i = 0;
+        while (iter.hasNext()) {
+            // Set the ID of each audio file in our list.
+            iter.next().setID(i);
+            i += 1;
+        }
     }
+
+    // Get the audio file needed with its ID.
+    public AudioFile getAudioFile (int ID) {
+        return audioFileList.get(ID);
+    }
+
     public ArrayList<AudioFile> getAudioFileList () {
         return audioFileList;
     }

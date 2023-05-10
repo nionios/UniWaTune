@@ -9,7 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
 public class PlayerFragment extends Fragment {
@@ -34,4 +37,15 @@ public class PlayerFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    /*
+    //TODO Does not work lol
+    @Override
+    public void onBackPressed(View view) {
+        NavController navController =
+                Navigation.findNavController(view);
+        navController.navigate(R.id.action_nav_player_to_nav_transform);
+    }
+
+     */
 }

@@ -1,10 +1,11 @@
 package com.nionios.uniwatune.ui.transform;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.nionios.uniwatune.MainActivity;
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
@@ -26,7 +28,6 @@ import com.nionios.uniwatune.databinding.ItemTransformBinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -106,18 +107,7 @@ public class TransformFragment extends Fragment {
           (memory optimisation, we are loading them as they are in the viewport) */
         @Override
         public void onBindViewHolder(@NonNull TransformViewHolder holder, int position) {
-            /* Singleton Way (maybe) */
-            // Iterate through audio file list and get their names
-             /*
-            AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
-            List<AudioFile> localInstanceAudioFileList = localAudioScannedInstance.getAudioFileList();
-            ArrayList<String> textsToDisplay = new ArrayList<String>();
-
-            holder.titleTextView.setText(localInstanceAudioFileList.get(position).getName());
-            holder.artistNameTextView.setText(localInstanceAudioFileList.get(position).getArtist());
-            holder.albumNameTextView.setText(localInstanceAudioFileList.get(position).getAlbum());
-            */
-             /* Google Way (maybe) */
+            // Get info of files from the audioFileArrayList and put them into the holder
             AudioFile AudioFileToDisplay = audioFileArrayList.get(position);
 
             holder.titleTextView.setText(AudioFileToDisplay.getName());
@@ -125,7 +115,6 @@ public class TransformFragment extends Fragment {
             holder.albumNameTextView.setText(AudioFileToDisplay.getAlbum());
 
             // TODO: tried the following, maybe it does not work
-
             holder.imageView.setImageDrawable(
                     // TODO: based on the file extension, make this icon different
                     //       See drawables above too!
@@ -135,6 +124,10 @@ public class TransformFragment extends Fragment {
                             null
                     )
             );
+            /* Set the fileID on holder so we can hold some kind of reference (its ID)
+             * to it and play it when clicking the item on UI. We need to go look for it
+             * through our AudioScanned singleton obj later for this to happen. */
+            holder.fileID = AudioFileToDisplay.getID();
         }
     }
 
@@ -147,6 +140,7 @@ public class TransformFragment extends Fragment {
         private final TextView artistNameTextView;
         private final TextView albumNameTextView;
         private final TextView titleTextView;
+        private int fileID;
 
         public TransformViewHolder(ItemTransformBinding binding) {
             super(binding.getRoot());
@@ -159,11 +153,19 @@ public class TransformFragment extends Fragment {
             albumNameTextView = binding.textViewAlbumNameTransform;
         }
 
+        public void setFileID (int inputFileID) {fileID = inputFileID;}
+
         @Override
         public void onClick(View view) {
             NavController navController =
                     Navigation.findNavController(view);
             navController.navigate(R.id.action_nav_transform_to_nav_player);
+            /* Get the reference to our song through the singleton AudioScanned
+             * and its ID, make sound play!*/
+            AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+            //TODO: Start new activity?
+            localAudioScannedInstance.getAudioFile(this.fileID)
+                    .play(view.getContext());
         }
     }
 }

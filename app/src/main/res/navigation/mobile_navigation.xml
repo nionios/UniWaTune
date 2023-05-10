@@ -39,5 +39,11 @@
         android:id="@+id/nav_player"
         android:name="com.nionios.uniwatune.ui.player.PlayerFragment"
         android:label="@string/menu_player"
-        tools:layout="@layout/fragment_player"/>
+        tools:layout="@layout/fragment_player">
+        <action
+            android:id="@+id/action_nav_player_to_nav_transform"
+            app:destination="@id/nav_transform"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
 </navigation>
