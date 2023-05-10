@@ -9,10 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
-import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
 public class PlayerFragment extends Fragment {
@@ -27,8 +24,21 @@ public class PlayerFragment extends Fragment {
         binding = FragmentPlayerBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textAlbums;
-        playerViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView playerTitleTextView = binding.playerTitleTextView;
+        playerViewModel.getMutableAudioFileTitle().observe(
+                getViewLifecycleOwner(),
+                playerTitleTextView::setText
+        );
+        final TextView playerAlbumTextView = binding.playerAlbumTextView;
+        playerViewModel.getMutableAudioFileAlbum().observe(
+                getViewLifecycleOwner(),
+                playerAlbumTextView::setText
+        );
+        final TextView playerArtistTextView = binding.playerArtistTextView;
+        playerViewModel.getMutableAudioFileArtist().observe(
+                getViewLifecycleOwner(),
+                playerArtistTextView::setText
+        );
         return root;
     }
 
@@ -44,8 +54,7 @@ public class PlayerFragment extends Fragment {
     public void onBackPressed(View view) {
         NavController navController =
                 Navigation.findNavController(view);
-        navController.navigate(R.id.action_nav_player_to_nav_transform);
+        navController.navigate(R.id.action_nav_player_to_nav_Player);
     }
-
      */
 }

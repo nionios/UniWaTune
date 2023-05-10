@@ -13,8 +13,8 @@
         <action
             android:id="@+id/action_nav_transform_to_nav_player"
             app:destination="@id/nav_player"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left" />
+            app:enterAnim="@anim/slide_in_right_without_fade"
+            app:exitAnim="@anim/slide_out_left_without_fade" />
     </fragment>
 
     <fragment

@@ -85,12 +85,10 @@ public class AudioFile {
         MediaPlayer localMediaPlayer =
                 MediaPlayer.create( context, Uri.parse(this.getPath()) );
         /* Switch out any currently playing mediaPlayer with this one if they exist, set this one
-         * as current. */
+         * as current. Also set the song as currently loaded on our MediaPlayer*/
         MediaPlayerController localMediaPlayerControllerInstance = MediaPlayerController.getInstance();
         localMediaPlayerControllerInstance.setMediaPlayer(localMediaPlayer);
-        //Prepare asynchronously so app does not slow down
-      //  localMediaPlayer.prepareAsync();
-        //localMediaPlayer.setLooping(true);
+        localMediaPlayerControllerInstance.setCurrentAudioFile(this);
         localMediaPlayer.start();
     }
 }

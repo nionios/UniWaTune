@@ -57,8 +57,7 @@ public class TransformFragment extends Fragment {
         ListAdapter<AudioFile, TransformViewHolder> adapter = new TransformAdapter(localInstanceAudioFileList);
 
         recyclerView.setAdapter(adapter);
-        // TODO: Make this receive all info (album name and artist name currently)
-        // TODO: Learn what in the world this thing does and why is it here
+
         transformViewModel.getTexts().observe(
                 getViewLifecycleOwner(),
                 adapter::submitList
@@ -152,8 +151,6 @@ public class TransformFragment extends Fragment {
             artistNameTextView = binding.textViewArtistNameTransform;
             albumNameTextView = binding.textViewAlbumNameTransform;
         }
-
-        public void setFileID (int inputFileID) {fileID = inputFileID;}
 
         @Override
         public void onClick(View view) {
