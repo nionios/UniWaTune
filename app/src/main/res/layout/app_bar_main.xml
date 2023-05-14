@@ -17,7 +17,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.UniWaTune.PopupOverlay" />
+            app:popupTheme="@style/Theme.UniWaTune.PopupOverlay"
+            app:titleTextAppearance="@style/TextAppearance.AppCompat.Display1"
+            app:titleTextColor="?attr/colorOnPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -41,7 +43,7 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/fab_content_description"
-            app:backgroundTint="#673AB7"
+            app:backgroundTint="?attr/colorPrimary"
             app:srcCompat="@android:drawable/ic_menu_search" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

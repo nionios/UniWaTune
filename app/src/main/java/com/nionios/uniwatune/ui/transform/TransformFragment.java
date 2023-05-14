@@ -1,7 +1,5 @@
 package com.nionios.uniwatune.ui.transform;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +17,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.nionios.uniwatune.MainActivity;
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
@@ -74,9 +71,16 @@ public class TransformFragment extends Fragment {
     private static class TransformAdapter extends ListAdapter<AudioFile, TransformViewHolder> {
 
         private ArrayList<AudioFile> audioFileArrayList;
-        // TODO: dark mode is still black, change color
+
+        private final int OPUS_FILE_TYPE_ICON = 1;
+        private final int MP3_FILE_TYPE_ICON = 2;
+        private final int OGG_FILE_TYPE_ICON = 3;
+
         private final List<Integer> drawables = Arrays.asList(
-                R.drawable.baseline_audio_file_24);
+                R.drawable.baseline_audio_file_24,
+                R.drawable.opus_file_type,
+                R.drawable.mp3_file_type,
+                R.drawable.ogg_file_type);
 
         protected TransformAdapter(ArrayList<AudioFile> audioFileArrayList) {
             super(new DiffUtil.ItemCallback<AudioFile>() {
@@ -113,20 +117,48 @@ public class TransformFragment extends Fragment {
             holder.artistNameTextView.setText(AudioFileToDisplay.getArtist());
             holder.albumNameTextView.setText(AudioFileToDisplay.getAlbum());
 
-            // TODO: tried the following, maybe it does not work
-            holder.imageView.setImageDrawable(
-                    // TODO: based on the file extension, make this icon different
-                    //       See drawables above too!
-                    ResourcesCompat.getDrawable(
-                            holder.imageView.getResources(),
-                            drawables.get(0),
-                            null
-                    )
-            );
+            /* Display a different Icon with each file type! */
+            String AudioToDisplayPath = AudioFileToDisplay.getPath();
+            // Check if song has cover art. If yes, then set it in the appropriate ImageView.
+            // TODO: make this work
+            if (AudioFileToDisplay.getAlbumArt() != null) {
+                holder.imageView.setImageBitmap(AudioFileToDisplay.getAlbumArt());
+            } else if (AudioToDisplayPath.contains("mp3")) {
+                holder.imageView.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                                holder.imageView.getResources(),
+                                drawables.get(MP3_FILE_TYPE_ICON),
+                                null
+                        )
+                );
+            } else if (AudioToDisplayPath.contains("opus")) {
+                holder.imageView.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                                holder.imageView.getResources(),
+                                drawables.get(OPUS_FILE_TYPE_ICON),
+                                null
+                        )
+                );
+            } else if (AudioToDisplayPath.contains("ogg")) {
+                holder.imageView.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                                holder.imageView.getResources(),
+                                drawables.get(OGG_FILE_TYPE_ICON),
+                                null
+                        )
+                );
+            }
+            // Theme a bit
+            //holder.imageView.setColorFilter(R.color.black);
+
             /* Set the fileID on holder so we can hold some kind of reference (its ID)
              * to it and play it when clicking the item on UI. We need to go look for it
              * through our AudioScanned singleton obj later for this to happen. */
             holder.fileID = AudioFileToDisplay.getID();
+            // Make text scroll when it overflows
+            holder.titleTextView.setSelected(true);
+            holder.artistNameTextView.setSelected(true);
+            holder.albumNameTextView.setSelected(true);
         }
     }
 

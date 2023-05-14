@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,6 +39,11 @@ public class PlayerFragment extends Fragment {
         playerViewModel.getMutableAudioFileArtist().observe(
                 getViewLifecycleOwner(),
                 playerArtistTextView::setText
+        );
+        final ImageView playerAlbumCoverImageView = binding.playerAlbumCoverImageView;
+        playerViewModel.getMutableAudioFileAlbumArt().observe(
+                getViewLifecycleOwner(),
+                playerAlbumCoverImageView::setImageBitmap
         );
         return root;
     }

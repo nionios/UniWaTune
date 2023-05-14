@@ -23,7 +23,7 @@
         app:layout_constraintVertical_bias="0.729" />
 
     <ImageView
-        android:id="@+id/player_album_cover_text_view"
+        android:id="@+id/player_album_cover_image_view"
         android:layout_width="244dp"
         android:layout_height="227dp"
         android:layout_marginTop="8dp"
@@ -34,7 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/player_album_text_view"
         app:layout_constraintVertical_bias="0.5"
-        app:srcCompat="@drawable/baseline_audio_file_24"
         tools:src="@tools:sample/avatars" />
 
     <TextView
@@ -73,7 +72,7 @@
         app:layout_constraintEnd_toStartOf="@+id/player_play_button"
         app:layout_constraintHorizontal_bias="0.482"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_image_view"
         app:layout_constraintVertical_bias="0.692" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -104,10 +103,11 @@
         android:id="@+id/player_album_text_view"
         android:layout_width="176dp"
         android:layout_height="30dp"
+        android:layout_marginTop="8dp"
         android:text="TextView"
         android:textAlignment="center"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/player_album_cover_text_view"
+        app:layout_constraintBottom_toTopOf="@+id/player_album_cover_image_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
