@@ -2,28 +2,22 @@ package com.nionios.uniwatune;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.Menu;
-import android.view.View;
-import android.widget.TextView;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.shape.MaterialShapeDrawable;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.nionios.uniwatune.data.helpers.fileFinder;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
