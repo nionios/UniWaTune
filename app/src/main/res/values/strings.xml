@@ -23,4 +23,7 @@
         item
     </string>
     <string name="menu_player">Media Player</string>
+    <string name="notification_title">UniWaTune Player</string>
+    <string name="notification_message">Currently Playing song</string>
+    <string name="ticker_text">tickerExample\n</string>
 </resources>

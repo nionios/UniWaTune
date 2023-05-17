@@ -1,8 +1,13 @@
 package com.nionios.uniwatune.data.services;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +15,7 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import java.io.IOException;
@@ -29,6 +35,8 @@ public class MediaPlayerControllerService
 
     private static final String ACTION_PLAY = "com.example.action.PLAY";
     private static final String ACTION_TOGGLE_PLAY_STATE = "com.example.action.TOGGLE_PLAY_STATE";
+    private static final int ONGOING_NOTIFICATION_ID = 13;
+    private static final String CHANNEL_DEFAULT_IMPORTANCE = "MediaPlayerControllerNotificationChannel";
 
     private MediaPlayer CurrentMediaPlayer;
     private AudioFile CurrentAudioFile;
@@ -40,6 +48,40 @@ public class MediaPlayerControllerService
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Create NotificationChannel
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    CHANNEL_DEFAULT_IMPORTANCE,
+                    "Foreground Service of player of UniWaTunes",
+                    NotificationManager.IMPORTANCE_LOW);
+            notificationChannel.setLightColor(Color.BLUE);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            assert manager != null;
+            manager.createNotificationChannel(notificationChannel);
+        }
+        /* We need a notification, since this is a foreground activity after all */
+        // If the notification supports a direct reply action, use
+        // PendingIntent.FLAG_MUTABLE instead.
+        Intent notificationIntent = new Intent(this, MediaPlayerControllerService.class);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent,
+                        PendingIntent.FLAG_IMMUTABLE);
+        // Build the notification
+        Notification notification = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notification = new Notification.Builder(this, CHANNEL_DEFAULT_IMPORTANCE)
+                    .setContentTitle(getText(R.string.notification_title))
+                    .setContentText(getText(R.string.notification_message))
+                    .setSmallIcon(R.drawable.baseline_audio_file_24)
+                    .setContentIntent(pendingIntent)
+                    .setTicker(getText(R.string.ticker_text))
+                    .build();
+        }
+
+        // Notification ID cannot be 0.
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
+
         Bundle extras = intent.getExtras();
 
         // Action play means the user is trying to play an audio file by clicking (not autoplay)
@@ -93,19 +135,6 @@ public class MediaPlayerControllerService
             return;
         }
         mediaPlayer.start();
-    }
-
-    /* Used when user clicks a file to play manually, cold start (not autoplay from queue) */
-    public void coldStartPlayingAudioFile (Context context, AudioFile inputAudioFile) {
-        System.out.println("Playing audio file with URI:" + Uri.parse(inputAudioFile.getPath()));
-        MediaPlayer localMediaPlayer =
-                MediaPlayer.create( context, Uri.parse(inputAudioFile.getPath()) );
-        /* Switch out any currently playing mediaPlayer with this one if they exist, set this one
-         * as current. Also set the song as currently loaded on our MediaPlayer*/
-        setMediaPlayer(localMediaPlayer);
-        setCurrentAudioFile(inputAudioFile);
-        //TODO: make this autodetect the queue! setQueue();
-        localMediaPlayer.start();
     }
 
     // If there is a mediaPlayer active, release it and set the new one as current.
