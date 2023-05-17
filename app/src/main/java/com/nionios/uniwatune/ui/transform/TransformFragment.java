@@ -1,11 +1,14 @@
 package com.nionios.uniwatune.ui.transform;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.Context;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -18,6 +21,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nionios.uniwatune.R;
+import com.nionios.uniwatune.data.services.MediaPlayerControllerService;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.FragmentTransformBinding;
@@ -192,9 +196,16 @@ public class TransformFragment extends Fragment {
             /* Get the reference to our song through the singleton AudioScanned
              * and its ID, make sound play!*/
             AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
-            //TODO: Start new activity?
-            localAudioScannedInstance.getAudioFile(this.fileID)
-                    .play(view.getContext());
+            /* Start the MediaPlayerControllerService and send the path as an extra*/
+            Context context = view.getContext();
+            Intent serviceIntent = new Intent(view.getContext(), MediaPlayerControllerService.class);
+            serviceIntent.putExtra("PATH",
+                    localAudioScannedInstance.getAudioFile(this.fileID).getPath());
+            context.startService(serviceIntent);
+            //TODO: what happens when else??
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent);
+            }
         }
     }
 }

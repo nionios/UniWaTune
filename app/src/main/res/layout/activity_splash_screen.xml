@@ -19,11 +19,12 @@
     <ImageView
         android:id="@+id/headPhones"
         android:layout_width="311dp"
-        android:layout_height="426dp"
+        android:layout_height="510dp"
         app:layout_constraintBottom_toBottomOf="@+id/logoWithoutHeadphones"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/logoWithoutHeadphones"
         app:layout_constraintTop_toTopOf="@+id/logoWithoutHeadphones"
+        app:layout_constraintVertical_bias="1.0"
         tools:srcCompat="@drawable/uniwatunes_logo_only_headphones" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

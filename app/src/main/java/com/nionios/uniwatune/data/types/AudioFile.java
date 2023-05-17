@@ -79,16 +79,4 @@ public class AudioFile {
     public String getPath() {return path;}
     public int getID() {return ID;}
     public void setID(int inputID) {ID = inputID;}
-
-    public void play (Context context) {
-        System.out.println("URI:" + Uri.parse(this.getPath()) );
-        MediaPlayer localMediaPlayer =
-                MediaPlayer.create( context, Uri.parse(this.getPath()) );
-        /* Switch out any currently playing mediaPlayer with this one if they exist, set this one
-         * as current. Also set the song as currently loaded on our MediaPlayer*/
-        MediaPlayerController localMediaPlayerControllerInstance = MediaPlayerController.getInstance();
-        localMediaPlayerControllerInstance.setMediaPlayer(localMediaPlayer);
-        localMediaPlayerControllerInstance.setCurrentAudioFile(this);
-        localMediaPlayer.start();
-    }
 }
