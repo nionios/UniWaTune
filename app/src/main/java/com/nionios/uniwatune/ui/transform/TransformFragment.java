@@ -201,6 +201,8 @@ public class TransformFragment extends Fragment {
             Intent serviceIntent = new Intent(view.getContext(), MediaPlayerControllerService.class);
             serviceIntent.putExtra("PATH",
                     localAudioScannedInstance.getAudioFile(this.fileID).getPath());
+            serviceIntent.setAction("com.uniwatune.action.PLAY");
+
             context.startService(serviceIntent);
             //TODO: what happens when else??
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

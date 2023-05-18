@@ -33,8 +33,8 @@ public class MediaPlayerControllerService
         extends Service
         implements MediaPlayer.OnCompletionListener {
 
-    private static final String ACTION_PLAY = "com.example.action.PLAY";
-    private static final String ACTION_TOGGLE_PLAY_STATE = "com.example.action.TOGGLE_PLAY_STATE";
+    private static final String ACTION_PLAY = "com.uniwatune.action.PLAY";
+    private static final String ACTION_TOGGLE_PLAY_STATE = "com.uniwatune.action.TOGGLE_PLAY_STATE";
     private static final int ONGOING_NOTIFICATION_ID = 13;
     private static final String CHANNEL_DEFAULT_IMPORTANCE = "MediaPlayerControllerNotificationChannel";
 
@@ -69,10 +69,12 @@ public class MediaPlayerControllerService
                         PendingIntent.FLAG_IMMUTABLE);
         // Build the notification
         Notification notification = null;
+        // TODO: Set Large Icon and make it bigger and with buttons, look into categories for notifs
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notification = new Notification.Builder(this, CHANNEL_DEFAULT_IMPORTANCE)
                     .setContentTitle(getText(R.string.notification_title))
                     .setContentText(getText(R.string.notification_message))
+                    // TODO: album art here
                     .setSmallIcon(R.drawable.baseline_audio_file_24)
                     .setContentIntent(pendingIntent)
                     .setTicker(getText(R.string.ticker_text))
@@ -115,6 +117,13 @@ public class MediaPlayerControllerService
         }
         // Sticky service!
         return START_STICKY;
+    }
+
+    // Dont use, we are not going to bind this service.
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
@@ -184,11 +193,5 @@ public class MediaPlayerControllerService
         player.start();
     }
      */
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
 }
