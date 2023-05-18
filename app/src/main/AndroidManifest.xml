@@ -14,11 +14,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UniWaTune"
         tools:targetApi="31">
-        <service android:name=".data.services.MediaPlayerControllerService" />
+        <service android:name=".data.services.MediaPlayerService.MediaPlayerService"
+                 android:exported="false">
+            <intent-filter>
+                <action android:name="com.uniwatune.action.ACTION_GET_CURRENT_SONG" />
+                <category android:name="android.intent.category.DEFAULT "/>
+            </intent-filter>
+        </service>
         <activity
             android:name=".SplashScreenActivity"
-            android:exported="true"
-            tools:targetApi="24">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

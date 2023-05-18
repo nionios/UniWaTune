@@ -21,7 +21,8 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nionios.uniwatune.R;
-import com.nionios.uniwatune.data.services.MediaPlayerControllerService;
+import com.nionios.uniwatune.data.controllers.MediaPlayerController;
+import com.nionios.uniwatune.data.services.MediaPlayerService.MediaPlayerService;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.FragmentTransformBinding;
@@ -196,18 +197,11 @@ public class TransformFragment extends Fragment {
             /* Get the reference to our song through the singleton AudioScanned
              * and its ID, make sound play!*/
             AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
-            /* Start the MediaPlayerControllerService and send the path as an extra*/
-            Context context = view.getContext();
-            Intent serviceIntent = new Intent(view.getContext(), MediaPlayerControllerService.class);
-            serviceIntent.putExtra("PATH",
-                    localAudioScannedInstance.getAudioFile(this.fileID).getPath());
-            serviceIntent.setAction("com.uniwatune.action.PLAY");
-
-            context.startService(serviceIntent);
-            //TODO: what happens when else??
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent);
-            }
+            /* Get the file path of the clicked file and create and send controller to do the heavy
+            *  lifting of communication with the MediaPlayerService */
+            String clickedFilePath = localAudioScannedInstance.getAudioFile(this.fileID).getPath();
+            MediaPlayerController localMediaPlayerController = new MediaPlayerController();
+            localMediaPlayerController.playSelectedAudioFile(view, clickedFilePath);
         }
     }
 }

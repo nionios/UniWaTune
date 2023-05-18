@@ -1,21 +1,14 @@
-package com.nionios.uniwatune.data.services;
+package com.nionios.uniwatune.data.services.MediaPlayerService;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 
-import androidx.annotation.Nullable;
-
-import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import java.io.IOException;
@@ -26,17 +19,21 @@ import java.util.Queue;
 /**
  * @description This is a service in which we store references pertaining the  currently
  * active media player and its queue, etc.
+ * This service can (and will be) started and bound too.
  * If another audio file needs to play, then we release the previous media player, making the
  * new one the current one.
  */
-public class MediaPlayerControllerService
+public class MediaPlayerService
         extends Service
         implements MediaPlayer.OnCompletionListener {
 
     private static final String ACTION_PLAY = "com.uniwatune.action.PLAY";
     private static final String ACTION_TOGGLE_PLAY_STATE = "com.uniwatune.action.TOGGLE_PLAY_STATE";
+    private static final String ACTION_GET_CURRENT_SONG =
+            "com.uniwatune.action.ACTION_GET_CURRENT_SONG";
     private static final int ONGOING_NOTIFICATION_ID = 13;
-    private static final String CHANNEL_DEFAULT_IMPORTANCE = "MediaPlayerControllerNotificationChannel";
+    // Binder for giving info to clients
+    private final IBinder binder = (IBinder) new MediaPlayerServiceBinder();
 
     private MediaPlayer CurrentMediaPlayer;
     private AudioFile CurrentAudioFile;
@@ -48,41 +45,11 @@ public class MediaPlayerControllerService
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Create NotificationChannel
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(
-                    CHANNEL_DEFAULT_IMPORTANCE,
-                    "Foreground Service of player of UniWaTunes",
-                    NotificationManager.IMPORTANCE_LOW);
-            notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            assert manager != null;
-            manager.createNotificationChannel(notificationChannel);
-        }
-        /* We need a notification, since this is a foreground activity after all */
-        // If the notification supports a direct reply action, use
-        // PendingIntent.FLAG_MUTABLE instead.
-        Intent notificationIntent = new Intent(this, MediaPlayerControllerService.class);
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, notificationIntent,
-                        PendingIntent.FLAG_IMMUTABLE);
-        // Build the notification
-        Notification notification = null;
-        // TODO: Set Large Icon and make it bigger and with buttons, look into categories for notifs
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notification = new Notification.Builder(this, CHANNEL_DEFAULT_IMPORTANCE)
-                    .setContentTitle(getText(R.string.notification_title))
-                    .setContentText(getText(R.string.notification_message))
-                    // TODO: album art here
-                    .setSmallIcon(R.drawable.baseline_audio_file_24)
-                    .setContentIntent(pendingIntent)
-                    .setTicker(getText(R.string.ticker_text))
-                    .build();
-        }
-
+        MediaPlayerServiceNotificationFactory notificationFactory =
+                new MediaPlayerServiceNotificationFactory();
+        Notification createdNotification = notificationFactory.makeNotification(this);
         // Notification ID cannot be 0.
-        startForeground(ONGOING_NOTIFICATION_ID, notification);
+        startForeground(ONGOING_NOTIFICATION_ID, createdNotification);
 
         Bundle extras = intent.getExtras();
 
@@ -119,11 +86,16 @@ public class MediaPlayerControllerService
         return START_STICKY;
     }
 
-    // Dont use, we are not going to bind this service.
-    @Nullable
+    public class MediaPlayerServiceBinder extends Binder {
+        public MediaPlayerService getService() {
+            // Return instance to clients for calling methods
+            return MediaPlayerService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     @Override
