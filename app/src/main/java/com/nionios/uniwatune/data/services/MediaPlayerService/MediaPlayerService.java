@@ -9,12 +9,16 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
  * @description This is a service in which we store references pertaining the  currently
@@ -67,9 +71,16 @@ public class MediaPlayerService
                      * set this one as current. Also set the song as currently loaded on
                      * our MediaPlayer*/
                     setMediaPlayer(localMediaPlayer);
-                    //TODO: make this autodetect the queue!
+                    //TODO: make this autodetect the queue! Comment
                     // setQueue();
-                    // setCurrentAudioFile(inputAudioFile);
+
+                    AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+                    ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
+                    List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
+                            .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
+                            .collect(Collectors.toList());
+                    setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));
+
                     localMediaPlayer.start();
                 }
             }

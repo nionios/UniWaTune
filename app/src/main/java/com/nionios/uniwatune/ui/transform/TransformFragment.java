@@ -191,17 +191,17 @@ public class TransformFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            NavController navController =
-                    Navigation.findNavController(view);
-            navController.navigate(R.id.action_nav_transform_to_nav_player);
             /* Get the reference to our song through the singleton AudioScanned
              * and its ID, make sound play!*/
             AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
             /* Get the file path of the clicked file and create and send controller to do the heavy
-            *  lifting of communication with the MediaPlayerService */
+             *  lifting of communication with the MediaPlayerService */
             String clickedFilePath = localAudioScannedInstance.getAudioFile(this.fileID).getPath();
             MediaPlayerController localMediaPlayerController = new MediaPlayerController();
             localMediaPlayerController.playSelectedAudioFile(view, clickedFilePath);
+            NavController navController =
+                    Navigation.findNavController(view);
+            navController.navigate(R.id.action_nav_transform_to_nav_player);
         }
     }
 }

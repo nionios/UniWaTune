@@ -38,24 +38,18 @@ public class MediaPlayerController {
             }
         };
         // Make the new explicit intent for getting the current song.
-        Intent getCurrentSongIntent = new Intent();
-        getCurrentSongIntent.setAction("com.uniwatune.action.ACTION_GET_CURRENT_SONG");
-        getCurrentSongIntent.setPackage("com.uniwatune");
-        context.bindService(
+        Intent getCurrentSongIntent = new Intent(context, MediaPlayerService.class);
+        //getCurrentSongIntent.setAction("ACTION_GET_CURRENT_SONG");
+        //getCurrentSongIntent.setPackage("com.uniwatune");
+        boolean connected = false;
+        connected = context.bindService(
                 getCurrentSongIntent,
                 localServiceConnection,
                 // This is zero because service is running at this point.
                 0
         );
-
-        if (isItBound) {
-            System.out.println("isItBound is true");
-        } else {
-            System.out.println("isItBound is false");
-        }
         // Make sure the file is fetched
-
-        //TODO: this is always NULL, no connection?
+        assert connected;
         assert currentFetchedAudioFile != null;
         return currentFetchedAudioFile;
     }
@@ -63,7 +57,7 @@ public class MediaPlayerController {
     public void playSelectedAudioFile(View view, String filePath) {
         /* Start the MediaPlayerControllerService and send the path as an extra*/
         Context context = view.getContext();
-        Intent serviceIntent = new Intent(view.getContext(), MediaPlayerService.class);
+        Intent serviceIntent = new Intent(context, MediaPlayerService.class);
         serviceIntent.putExtra("PATH", filePath);
         serviceIntent.setAction("com.uniwatune.action.PLAY");
         /* Start our MediaPlayerControllerService */
