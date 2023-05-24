@@ -18,7 +18,7 @@ public class MediaPlayerController {
     boolean isItBound;
     MediaPlayerService localMediaPlayerService;
     AudioFile currentFetchedAudioFile;
-    public AudioFile getCurrentAudioFileFromService (Context context) {
+    public void getCurrentAudioFileFromService (Context context) {
         // Make the new service connection and set isItBound flag appropriately.
         ServiceConnection localServiceConnection = new ServiceConnection() {
             @Override
@@ -42,6 +42,7 @@ public class MediaPlayerController {
         //getCurrentSongIntent.setAction("ACTION_GET_CURRENT_SONG");
         //getCurrentSongIntent.setPackage("com.uniwatune");
         boolean connected = false;
+        //bind service is asynchronous, so we do not return anything
         connected = context.bindService(
                 getCurrentSongIntent,
                 localServiceConnection,
@@ -49,22 +50,24 @@ public class MediaPlayerController {
                 0
         );
         // Make sure the file is fetched
+        /*
         assert connected;
         assert currentFetchedAudioFile != null;
         return currentFetchedAudioFile;
+
+         */
     }
 
+    /** File Path instead of serializing the whole object is used because Native Android serializing
+     *  is slow and not needed in this case, we can find the object with its unique path anyway. */
     public void playSelectedAudioFile(View view, String filePath) {
         /* Start the MediaPlayerControllerService and send the path as an extra*/
-        Context context = view.getContext();
+        Context context = view.getContext().getApplicationContext();
         Intent serviceIntent = new Intent(context, MediaPlayerService.class);
         serviceIntent.putExtra("PATH", filePath);
         serviceIntent.setAction("com.uniwatune.action.PLAY");
         /* Start our MediaPlayerControllerService */
         context.startService(serviceIntent);
-        /* Bind our MediaPlayerControllerService too for info exchange */
-        //context.bindService(serviceIntent, )
-        //TODO: what happens when else??
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(serviceIntent);
         }

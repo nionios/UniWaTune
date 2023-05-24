@@ -22,9 +22,9 @@ public class PlayerViewModel extends AndroidViewModel {
     public PlayerViewModel(Application application) {
         super(application);
         MediaPlayerController localMediaPlayerController = new MediaPlayerController();
+        localMediaPlayerController.getCurrentAudioFileFromService(
+                getApplication().getApplicationContext());
         AudioFile localCurrentAudioFile =
-                localMediaPlayerController.getCurrentAudioFileFromService(
-                        getApplication().getApplicationContext());
 
         mutableTransferAudioFileTitle    = new MutableLiveData<>(localCurrentAudioFile.getName());
         mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());

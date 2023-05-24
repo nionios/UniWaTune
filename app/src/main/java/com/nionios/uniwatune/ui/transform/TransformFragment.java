@@ -199,8 +199,7 @@ public class TransformFragment extends Fragment {
             String clickedFilePath = localAudioScannedInstance.getAudioFile(this.fileID).getPath();
             MediaPlayerController localMediaPlayerController = new MediaPlayerController();
             localMediaPlayerController.playSelectedAudioFile(view, clickedFilePath);
-            NavController navController =
-                    Navigation.findNavController(view);
+            NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_nav_transform_to_nav_player);
         }
     }

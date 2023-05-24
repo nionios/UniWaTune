@@ -7,8 +7,14 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
+import android.os.HandlerThread;
 
+import com.nionios.uniwatune.MainActivity;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 
@@ -73,14 +79,15 @@ public class MediaPlayerService
                     setMediaPlayer(localMediaPlayer);
                     //TODO: make this autodetect the queue! Comment
                     // setQueue();
-
+                    // Get AudioScanned singleton instance so we are able to search for the file
                     AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
                     ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
+                    // The first (an only) match is our instantiated object on memory, set it as
+                    // current song with setCurrentAudioFile
                     List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
                             .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
                             .collect(Collectors.toList());
                     setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));
-
                     localMediaPlayer.start();
                 }
             }
@@ -91,6 +98,20 @@ public class MediaPlayerService
                 toggleMediaPlayerPlayState();
             } else {
                 //TODO something?
+            }
+        }
+
+        if (Objects.equals(intent.getAction(), ACTION_GET_CURRENT_SONG)) {
+            if (CurrentAudioFile != null) {
+                //TODO: Make new activity to play audio! Then on create
+                // make something like this: https://stackoverflow.com/questions/18146614/how-to-send-string-from-one-activity-to-another
+                Intent returnedAudioFile = new Intent(this, MainActivity.class);
+                returnedAudioFile.putExtra("audioFileName", CurrentAudioFile.getName());
+                returnedAudioFile.putExtra("audioFileArtist", CurrentAudioFile.getArtist());
+                returnedAudioFile.putExtra("audioFileAlbum", CurrentAudioFile.getAlbum());
+                startActivity(returnedAudioFile);
+            } else {
+                //TODO: send "no current song playing or something
             }
         }
         // Sticky service!
