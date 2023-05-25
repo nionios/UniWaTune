@@ -18,17 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Queue;
 
-/** @description With this comparator we are able to sort the audio files alphabetically according
- *  to the audio file names. */
-class AudioFileLexicographicComparator implements Comparator<AudioFile> {
-    @Override
-    public int compare(AudioFile a, AudioFile b) {
-        return a.getName().compareToIgnoreCase(b.getName());
-    }
-}
 /**
  * @description This is a service in which we store references pertaining the  currently
  * active media player and its queue, etc.
@@ -57,9 +51,11 @@ public class MediaPlayerService
     public MediaPlayer getCurrentMediaPlayer() {return CurrentMediaPlayer;}
 
     public Queue<AudioFile> trimQueue (Queue<AudioFile> inputQueue, String filePath) {
-        for (AudioFile file : inputQueue) {
-            if (file.getPath().compareTo(filePath) != 0) {
-                inputQueue.remove(file);
+        while (inputQueue.iterator().hasNext()) {
+            assert inputQueue.peek() != null;
+            if (inputQueue.peek().getPath().compareTo(filePath) != 0) {
+                // Remove head element from queue
+                inputQueue.poll();
             } else {
                 // Getting here means that we found our current file in the queue and have trimmed
                 // everything else before that.
@@ -96,19 +92,15 @@ public class MediaPlayerService
                     // Get AudioScanned singleton instance so we are able to search for the file
                     AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
                     ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
-                    /* Sort the Audio Scanned file list with out comparator to construct the list
-                     * of songs in app */
-                    Collections.sort(localAudioFileList, new AudioFileLexicographicComparator());
                     // The first (an only) match is our instantiated object on memory
                     // TODO: set it as current song with setCurrentAudioFile or just front of queue?
                     /*List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
                             .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
                             .collect(Collectors.toList());
                     setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));*/
-
                     // Cut off the queue up to the current audio file (no previous songs)
-                    Queue<AudioFile> NewQueue =
-                            trimQueue((Queue<AudioFile>) localAudioFileList, inputAudioFilePath);
+                    Queue<AudioFile> NewQueue = new LinkedList<>(localAudioFileList);
+                    NewQueue = trimQueue(NewQueue, inputAudioFilePath);
                     // Get the queue storage singleton and store the queue there.
                     AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
                     localAudioQueueStorage.setAudioQueue(NewQueue);
@@ -153,8 +145,8 @@ public class MediaPlayerService
             AudioFile nextAudioFileInQueue = localAudioQueueInstance.peek();
             assert nextAudioFileInQueue != null;
             mediaPlayer.setDataSource(nextAudioFileInQueue.getPath());
-            // Set our variable too
-            setCurrentAudioFile(nextAudioFileInQueue);
+            // Set our variable too TODO: set this or nah?
+            //setCurrentAudioFile(nextAudioFileInQueue);
         } catch (IOException e) {
             // Do not actually stop app, just stop playing
             //TODO: let user know?

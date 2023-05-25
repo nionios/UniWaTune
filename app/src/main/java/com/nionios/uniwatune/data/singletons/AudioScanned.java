@@ -3,7 +3,17 @@ package com.nionios.uniwatune.data.singletons;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
+
+/** @description With this comparator we are able to sort the audio files alphabetically according
+ *  to the audio file names. */
+class AudioFileLexicographicComparator implements Comparator<AudioFile> {
+    @Override
+    public int compare(AudioFile a, AudioFile b) {
+        return a.getName().compareToIgnoreCase(b.getName());
+    }
+}
 
 /**
  * {@code @description}  Singleton that stores info of the audio files scanned in device.
@@ -28,6 +38,8 @@ public class AudioScanned {
 
     public void setAudioFileList (ArrayList<AudioFile> inputAudioFileList) {
         audioFileList = inputAudioFileList;
+        // Sort list and then give the IDs
+        sortAudioFileList();
         Iterator<AudioFile> iter = audioFileList.iterator();
         int i = 0;
         while (iter.hasNext()) {
@@ -35,6 +47,12 @@ public class AudioScanned {
             iter.next().setID(i);
             i += 1;
         }
+    }
+
+    /* Sort the Audio Scanned file list with our lexicographic comparator to construct the list
+     * of songs in app */
+    public void sortAudioFileList () {
+        audioFileList.sort(new AudioFileLexicographicComparator());
     }
 
     // Get the audio file needed with its ID.

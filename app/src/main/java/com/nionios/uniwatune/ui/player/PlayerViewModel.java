@@ -28,6 +28,7 @@ public class PlayerViewModel extends AndroidViewModel {
         Queue<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
         AudioFile localCurrentAudioFile = localAudioQueueInstance.peek();
 
+        assert localCurrentAudioFile != null;
         mutableTransferAudioFileTitle    = new MutableLiveData<>(localCurrentAudioFile.getName());
         mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());
         mutableTransferAudioFileAlbum    = new MutableLiveData<>(localCurrentAudioFile.getAlbum());
