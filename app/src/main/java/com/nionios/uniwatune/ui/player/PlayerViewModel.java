@@ -3,12 +3,14 @@ package com.nionios.uniwatune.ui.player;
 import android.app.Application;
 import android.graphics.Bitmap;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.AndroidViewModel;
 
-import com.nionios.uniwatune.data.controllers.MediaPlayerController;
+import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.types.AudioFile;
+
+import java.util.Queue;
 
 
 /* AndroidViewModel is an Application context aware ViewModel.
@@ -21,10 +23,10 @@ public class PlayerViewModel extends AndroidViewModel {
 
     public PlayerViewModel(Application application) {
         super(application);
-        MediaPlayerController localMediaPlayerController = new MediaPlayerController();
-        localMediaPlayerController.getCurrentAudioFileFromService(
-                getApplication().getApplicationContext());
-        AudioFile localCurrentAudioFile =
+        // Get the currently playing song from the first position of our queue
+        AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+        Queue<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
+        AudioFile localCurrentAudioFile = localAudioQueueInstance.peek();
 
         mutableTransferAudioFileTitle    = new MutableLiveData<>(localCurrentAudioFile.getName());
         mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());

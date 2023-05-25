@@ -7,25 +7,28 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Process;
-import android.os.HandlerThread;
 
-import com.nionios.uniwatune.MainActivity;
+import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
+/** @description With this comparator we are able to sort the audio files alphabetically according
+ *  to the audio file names. */
+class AudioFileLexicographicComparator implements Comparator<AudioFile> {
+    @Override
+    public int compare(AudioFile a, AudioFile b) {
+        return a.getName().compareToIgnoreCase(b.getName());
+    }
+}
 /**
  * @description This is a service in which we store references pertaining the  currently
  * active media player and its queue, etc.
@@ -47,11 +50,24 @@ public class MediaPlayerService
 
     private MediaPlayer CurrentMediaPlayer;
     private AudioFile CurrentAudioFile;
-    private Queue<AudioFile> AudioFileQueue = new LinkedList<>();
+
     public AudioFile getCurrentAudioFile() {
         return CurrentAudioFile;
     }
     public MediaPlayer getCurrentMediaPlayer() {return CurrentMediaPlayer;}
+
+    public Queue<AudioFile> trimQueue (Queue<AudioFile> inputQueue, String filePath) {
+        for (AudioFile file : inputQueue) {
+            if (file.getPath().compareTo(filePath) != 0) {
+                inputQueue.remove(file);
+            } else {
+                // Getting here means that we found our current file in the queue and have trimmed
+                // everything else before that.
+                break;
+            }
+        }
+        return inputQueue;
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -77,17 +93,26 @@ public class MediaPlayerService
                      * set this one as current. Also set the song as currently loaded on
                      * our MediaPlayer*/
                     setMediaPlayer(localMediaPlayer);
-                    //TODO: make this autodetect the queue! Comment
-                    // setQueue();
                     // Get AudioScanned singleton instance so we are able to search for the file
                     AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
                     ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
-                    // The first (an only) match is our instantiated object on memory, set it as
-                    // current song with setCurrentAudioFile
-                    List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
+                    /* Sort the Audio Scanned file list with out comparator to construct the list
+                     * of songs in app */
+                    Collections.sort(localAudioFileList, new AudioFileLexicographicComparator());
+                    // The first (an only) match is our instantiated object on memory
+                    // TODO: set it as current song with setCurrentAudioFile or just front of queue?
+                    /*List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
                             .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
                             .collect(Collectors.toList());
-                    setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));
+                    setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));*/
+
+                    // Cut off the queue up to the current audio file (no previous songs)
+                    Queue<AudioFile> NewQueue =
+                            trimQueue((Queue<AudioFile>) localAudioFileList, inputAudioFilePath);
+                    // Get the queue storage singleton and store the queue there.
+                    AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+                    localAudioQueueStorage.setAudioQueue(NewQueue);
+                    // Start the media player finally
                     localMediaPlayer.start();
                 }
             }
@@ -101,19 +126,6 @@ public class MediaPlayerService
             }
         }
 
-        if (Objects.equals(intent.getAction(), ACTION_GET_CURRENT_SONG)) {
-            if (CurrentAudioFile != null) {
-                //TODO: Make new activity to play audio! Then on create
-                // make something like this: https://stackoverflow.com/questions/18146614/how-to-send-string-from-one-activity-to-another
-                Intent returnedAudioFile = new Intent(this, MainActivity.class);
-                returnedAudioFile.putExtra("audioFileName", CurrentAudioFile.getName());
-                returnedAudioFile.putExtra("audioFileArtist", CurrentAudioFile.getArtist());
-                returnedAudioFile.putExtra("audioFileAlbum", CurrentAudioFile.getAlbum());
-                startActivity(returnedAudioFile);
-            } else {
-                //TODO: send "no current song playing or something
-            }
-        }
         // Sticky service!
         return START_STICKY;
     }
@@ -133,10 +145,12 @@ public class MediaPlayerService
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         // Remove audio file that just played (it's in front of the queue)
-        AudioFileQueue.remove();
+        AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+        Queue<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
+        localAudioQueueInstance.remove();
         // Play audio file now in front of the queue, make sure the element is not zero
         try {
-            AudioFile nextAudioFileInQueue = AudioFileQueue.peek();
+            AudioFile nextAudioFileInQueue = localAudioQueueInstance.peek();
             assert nextAudioFileInQueue != null;
             mediaPlayer.setDataSource(nextAudioFileInQueue.getPath());
             // Set our variable too
@@ -162,14 +176,6 @@ public class MediaPlayerService
 
     public void setCurrentAudioFile (AudioFile inputAudioFile) {
         CurrentAudioFile = inputAudioFile;
-    }
-
-    public void setQueue (LinkedList<AudioFile> inputAudioFileQueue) {
-        AudioFileQueue = inputAudioFileQueue;
-    }
-
-    public void addToQueue (AudioFile inputAudioFile) {
-        AudioFileQueue.add(inputAudioFile);
     }
 
     public void pauseMediaPlayer () {

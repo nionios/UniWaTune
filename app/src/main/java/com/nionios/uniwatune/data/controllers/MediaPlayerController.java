@@ -18,6 +18,7 @@ public class MediaPlayerController {
     boolean isItBound;
     MediaPlayerService localMediaPlayerService;
     AudioFile currentFetchedAudioFile;
+    //TODO: rework this into a play/pause action
     public void getCurrentAudioFileFromService (Context context) {
         // Make the new service connection and set isItBound flag appropriately.
         ServiceConnection localServiceConnection = new ServiceConnection() {
