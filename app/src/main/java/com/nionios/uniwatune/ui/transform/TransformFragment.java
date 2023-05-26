@@ -1,14 +1,12 @@
 package com.nionios.uniwatune.ui.transform;
 
-import android.os.Build;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.content.Context;
-import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -22,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
-import com.nionios.uniwatune.data.services.MediaPlayerService.MediaPlayerService;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.FragmentTransformBinding;
@@ -153,9 +150,6 @@ public class TransformFragment extends Fragment {
                         )
                 );
             }
-            // Theme a bit
-            //holder.imageView.setColorFilter(R.color.black);
-
             /* Set the fileID on holder so we can hold some kind of reference (its ID)
              * to it and play it when clicking the item on UI. We need to go look for it
              * through our AudioScanned singleton obj later for this to happen. */

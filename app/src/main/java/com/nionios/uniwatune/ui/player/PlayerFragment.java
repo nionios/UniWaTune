@@ -1,6 +1,7 @@
 package com.nionios.uniwatune.ui.player;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
+import com.nionios.uniwatune.ui.transform.TransformFragment;
 
 public class PlayerFragment extends Fragment {
 
     private FragmentPlayerBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         PlayerViewModel playerViewModel =
                 new ViewModelProvider(this).get(PlayerViewModel.class);
 
@@ -45,6 +48,10 @@ public class PlayerFragment extends Fragment {
                 getViewLifecycleOwner(),
                 playerAlbumCoverImageView::setImageBitmap
         );
+        // Make text scroll when it overflows
+        playerTitleTextView.setSelected(true);
+        playerAlbumTextView.setSelected(true);
+        playerArtistTextView.setSelected(true);
         return root;
     }
 
