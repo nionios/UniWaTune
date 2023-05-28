@@ -1,12 +1,14 @@
 package com.nionios.uniwatune.ui.player;
 
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.types.AudioFile;
 

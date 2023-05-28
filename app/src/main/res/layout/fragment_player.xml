@@ -7,6 +7,74 @@
     android:background="?attr/android:colorBackground"
     tools:context=".ui.player.PlayerFragment">
 
+    <ImageButton
+        android:id="@+id/player_previous_button"
+        android:layout_width="51dp"
+        android:layout_height="58dp"
+        android:background="@android:color/transparent"
+        android:minWidth="0pt"
+        android:padding="0pt"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_skip_previous_24"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/text_albums"
+        app:layout_constraintEnd_toStartOf="@+id/player_play_button"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/imageButton"
+        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_image_view" />
+
+    <ImageButton
+        android:id="@+id/player_next_button"
+        android:layout_width="51dp"
+        android:layout_height="58dp"
+        android:background="@android:color/transparent"
+        android:minWidth="0pt"
+        android:padding="0pt"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_skip_next_24"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/text_albums"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/player_play_button"
+        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_image_view"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <ImageButton
+        android:id="@+id/player_loop_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:backgroundTint="?attr/colorPrimary"
+        android:minWidth="0pt"
+        android:padding="0pt"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_repeat_24"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/text_albums"
+        app:layout_constraintEnd_toStartOf="@+id/player_play_button"
+        app:layout_constraintHorizontal_bias="0.459"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_image_view" />
+
+    <ImageButton
+        android:id="@+id/player_shuffle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:backgroundTint="?attr/colorPrimary"
+        android:minWidth="0pt"
+        android:padding="0pt"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_shuffle_24"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/text_albums"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.279"
+        app:layout_constraintStart_toEndOf="@+id/player_next_button"
+        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_image_view"
+        app:layout_constraintVertical_bias="0.5" />
+
     <TextView
         android:id="@+id/text_albums"
         android:layout_width="match_parent"
@@ -77,17 +145,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/player_title_text_view"
         app:layout_constraintVertical_bias="0.5" />
-
-    <Switch
-        android:id="@+id/playerLoopSwitch"
-        android:layout_width="53dp"
-        android:layout_height="37dp"
-        android:layout_marginStart="52dp"
-        android:thumb="@drawable/baseline_loop_24"
-        app:layout_constraintBottom_toTopOf="@+id/text_albums"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player_album_cover_image_view"
-        app:layout_constraintVertical_bias="0.239" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

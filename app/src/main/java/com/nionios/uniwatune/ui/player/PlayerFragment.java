@@ -1,6 +1,7 @@
 package com.nionios.uniwatune.ui.player;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -52,6 +54,7 @@ public class PlayerFragment extends Fragment {
         );
 
         // Make text scroll when it overflows
+        //FIXME: only works on unlock phone
         playerTitleTextView.setSelected(true);
         playerAlbumTextView.setSelected(true);
         playerArtistTextView.setSelected(true);
