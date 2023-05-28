@@ -36,14 +36,13 @@ public class MediaPlayerService
 
     private static final String ACTION_PLAY = "com.uniwatune.action.PLAY";
     private static final String ACTION_TOGGLE_PLAY_STATE = "com.uniwatune.action.TOGGLE_PLAY_STATE";
-    private static final String ACTION_GET_CURRENT_SONG =
-            "com.uniwatune.action.ACTION_GET_CURRENT_SONG";
     private static final int ONGOING_NOTIFICATION_ID = 13;
     // Binder for giving info to clients
     private final IBinder binder = (IBinder) new MediaPlayerServiceBinder();
 
     private MediaPlayer CurrentMediaPlayer;
     private AudioFile CurrentAudioFile;
+    private boolean isAudioPlaying;
 
     public AudioFile getCurrentAudioFile() {
         return CurrentAudioFile;
@@ -104,6 +103,7 @@ public class MediaPlayerService
                     // Get the queue storage singleton and store the queue there.
                     AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
                     localAudioQueueStorage.setAudioQueue(NewQueue);
+                    localAudioQueueStorage.setIsQueueActive(true);
                     // Start the media player finally
                     localMediaPlayer.start();
                 }
@@ -147,13 +147,14 @@ public class MediaPlayerService
             mediaPlayer.setDataSource(nextAudioFileInQueue.getPath());
             // Set our variable too TODO: set this or nah?
             //setCurrentAudioFile(nextAudioFileInQueue);
+            localAudioQueueStorage.setIsQueueActive(true);
+            mediaPlayer.start();
         } catch (IOException e) {
             // Do not actually stop app, just stop playing
             //TODO: let user know?
             System.out.println("END OF QUEUE REACHED!");
-            return;
+            localAudioQueueStorage.setIsQueueActive(false);
         }
-        mediaPlayer.start();
     }
 
     // If there is a mediaPlayer active, release it and set the new one as current.
@@ -177,10 +178,14 @@ public class MediaPlayerService
     }
 
     public void toggleMediaPlayerPlayState () {
+        //Set the variable in the queue singleton and play/pause the audio
+        AudioQueueStorage localAudioQueueStorageInstance = AudioQueueStorage.getInstance();
         if (CurrentMediaPlayer.isPlaying()) {
             CurrentMediaPlayer.pause();
+            localAudioQueueStorageInstance.setIsQueueActive(false);
         } else {
             CurrentMediaPlayer.start();
+            localAudioQueueStorageInstance.setIsQueueActive(true);
         }
     }
 

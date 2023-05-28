@@ -9,6 +9,8 @@ public class AudioQueueStorage {
     private static AudioQueueStorage AUDIO_QUEUE_INSTANCE;
     private Queue<AudioFile> AudioQueue = new LinkedList<>();
     private AudioQueueStorage() {}
+    // If isQueueActive is true, then the song on index 0 is currently playing
+    private boolean isQueueActive;
 
     public static AudioQueueStorage getInstance() {
         if(AUDIO_QUEUE_INSTANCE == null) {
@@ -28,5 +30,6 @@ public class AudioQueueStorage {
     public void addToAudioQueue (AudioFile inputAudioFile) {
         AudioQueue.add(inputAudioFile);
     }
-
+    public boolean getIsQueueActive () {return isQueueActive;}
+    public void setIsQueueActive (boolean inputIsQueueActive) {isQueueActive=inputIsQueueActive;}
 }

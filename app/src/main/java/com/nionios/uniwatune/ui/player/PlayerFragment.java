@@ -1,19 +1,27 @@
 package com.nionios.uniwatune.ui.player;
 
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.AnimatedStateListDrawable;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.nionios.uniwatune.R;
+import com.nionios.uniwatune.data.controllers.MediaPlayerController;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
-import com.nionios.uniwatune.ui.transform.TransformFragment;
 
 public class PlayerFragment extends Fragment {
 
@@ -48,10 +56,41 @@ public class PlayerFragment extends Fragment {
                 getViewLifecycleOwner(),
                 playerAlbumCoverImageView::setImageBitmap
         );
+
         // Make text scroll when it overflows
         playerTitleTextView.setSelected(true);
         playerAlbumTextView.setSelected(true);
         playerArtistTextView.setSelected(true);
+        // Create a controller object and see if song is playing currently
+        // According to the state of the song (playing/not) set the appropriate drawable.
+        // This is on initial viewing of the player
+        MediaPlayerController localMediaPlayerController = new MediaPlayerController();
+        Drawable appropriateDrawableInitial;
+        if (localMediaPlayerController.isAudioPlaying()) {
+            appropriateDrawableInitial = ContextCompat.getDrawable(getContext(),
+                    R.drawable.baseline_pause_circle_24);
+        } else {
+            appropriateDrawableInitial = ContextCompat.getDrawable(getContext(),
+                    R.drawable.baseline_play_circle_24);
+        }
+        binding.playerPlayButton.setImageDrawable(appropriateDrawableInitial);
+        // Signal the service to start/stop the song on click.
+        // According to the state of the song (playing/not) set the appropriate drawable again.
+        // This is on click of playerPlayButton on player
+        binding.playerPlayButton.setOnClickListener(view -> {
+                localMediaPlayerController.toggleCurrentlyPlayingSongPlayState(getContext());
+                // According to the state of the song (playing/not) set the appropriate drawable.
+                Drawable appropriateDrawableOnClick;
+                if (localMediaPlayerController.isAudioPlaying()) {
+                    appropriateDrawableOnClick = ContextCompat.getDrawable(getContext(),
+                            R.drawable.baseline_play_circle_24);
+                } else {
+                    appropriateDrawableOnClick = ContextCompat.getDrawable(getContext(),
+                            R.drawable.baseline_pause_circle_24);
+                }
+                binding.playerPlayButton.setImageDrawable(appropriateDrawableOnClick);
+            }
+        );
         return root;
     }
 

@@ -6,20 +6,22 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.view.View;
 
 import com.nionios.uniwatune.data.services.MediaPlayerService.MediaPlayerService;
-import com.nionios.uniwatune.data.types.AudioFile;
+import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 
 /**@description this is our media player controller. Ui communicates with this class
  * so this could communicate with the MediaPlayerService (This is middleware) */
 public class MediaPlayerController {
     boolean isItBound;
     MediaPlayerService localMediaPlayerService;
-    AudioFile currentFetchedAudioFile;
-    //TODO: rework this into a play/pause action
-    public void getCurrentAudioFileFromService (Context context) {
+
+    /**
+     * * @param context
+     * Communicates with the service to pause or play the song currently playing
+     */
+    public void toggleCurrentlyPlayingSongPlayState (Context context) {
         // Make the new service connection and set isItBound flag appropriately.
         ServiceConnection localServiceConnection = new ServiceConnection() {
             @Override
@@ -28,8 +30,7 @@ public class MediaPlayerController {
                 MediaPlayerService.MediaPlayerServiceBinder serviceBinder =
                         (MediaPlayerService.MediaPlayerServiceBinder) iBinder ;
                 localMediaPlayerService = serviceBinder.getService();
-                // Get the current audio file from our bound service
-                currentFetchedAudioFile = localMediaPlayerService.getCurrentAudioFile();
+                localMediaPlayerService.toggleMediaPlayerPlayState();
                 isItBound = true;
             }
 
@@ -50,13 +51,12 @@ public class MediaPlayerController {
                 // This is zero because service is running at this point.
                 0
         );
-        // Make sure the file is fetched
-        /*
-        assert connected;
-        assert currentFetchedAudioFile != null;
-        return currentFetchedAudioFile;
+    }
 
-         */
+    // If the queue is active, this means the current song is playing.
+    public boolean isAudioPlaying() {
+        AudioQueueStorage localAudioQueueStorageInstance = AudioQueueStorage.getInstance();
+        return localAudioQueueStorageInstance.getIsQueueActive();
     }
 
     /** File Path instead of serializing the whole object is used because Native Android serializing
