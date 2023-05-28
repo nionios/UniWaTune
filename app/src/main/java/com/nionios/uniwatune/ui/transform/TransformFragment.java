@@ -1,6 +1,5 @@
 package com.nionios.uniwatune.ui.transform;
 
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -155,6 +154,7 @@ public class TransformFragment extends Fragment {
              * through our AudioScanned singleton obj later for this to happen. */
             holder.fileID = AudioFileToDisplay.getID();
             // Make text scroll when it overflows
+            //FIXME: does not work!
             holder.titleTextView.setSelected(true);
             holder.artistNameTextView.setSelected(true);
             holder.albumNameTextView.setSelected(true);

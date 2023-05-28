@@ -1,14 +1,10 @@
 package com.nionios.uniwatune.ui.player;
 
-import android.graphics.drawable.Animatable;
-import android.graphics.drawable.AnimatedStateListDrawable;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,9 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
@@ -67,10 +61,10 @@ public class PlayerFragment extends Fragment {
         MediaPlayerController localMediaPlayerController = new MediaPlayerController();
         Drawable appropriateDrawableInitial;
         if (localMediaPlayerController.isAudioPlaying()) {
-            appropriateDrawableInitial = ContextCompat.getDrawable(getContext(),
+            appropriateDrawableInitial = ContextCompat.getDrawable(requireContext(),
                     R.drawable.baseline_pause_circle_24);
         } else {
-            appropriateDrawableInitial = ContextCompat.getDrawable(getContext(),
+            appropriateDrawableInitial = ContextCompat.getDrawable(requireContext(),
                     R.drawable.baseline_play_circle_24);
         }
         binding.playerPlayButton.setImageDrawable(appropriateDrawableInitial);
@@ -82,10 +76,10 @@ public class PlayerFragment extends Fragment {
                 // According to the state of the song (playing/not) set the appropriate drawable.
                 Drawable appropriateDrawableOnClick;
                 if (localMediaPlayerController.isAudioPlaying()) {
-                    appropriateDrawableOnClick = ContextCompat.getDrawable(getContext(),
+                    appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
                             R.drawable.baseline_play_circle_24);
                 } else {
-                    appropriateDrawableOnClick = ContextCompat.getDrawable(getContext(),
+                    appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
                             R.drawable.baseline_pause_circle_24);
                 }
                 binding.playerPlayButton.setImageDrawable(appropriateDrawableOnClick);

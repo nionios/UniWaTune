@@ -23,6 +23,7 @@ import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.ActivityMainBinding;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,8 +51,12 @@ public class MainActivity extends AppCompatActivity {
         fileFinder localFileFinder = new fileFinder();
 
         // Get the list of our scanned AudioFiles
-        ArrayList<AudioFile> localAudioFileList =
-                localFileFinder.getAllAudioFromDevice(this.getApplicationContext());
+        ArrayList<AudioFile> localAudioFileList;
+        try {
+            localAudioFileList = localFileFinder.getAllAudioFromDevice(this.getApplicationContext());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // Store it in out singleton with the scanned audio files
         audioScannedMainActInstance.setAudioFileList(localAudioFileList);
 

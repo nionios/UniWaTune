@@ -1,11 +1,6 @@
 package com.nionios.uniwatune.data.types;
 
-import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
@@ -20,9 +15,9 @@ public class AudioFile {
     // The id is being set once the song is on the AudioScanned List.
     int ID;
 
-    public AudioFile (
-            String inputPath,
-            String inputName,
+    public AudioFile(
+            @NonNull String inputPath,
+            @NonNull String inputName,
             String inputArtist,
             String inputAlbum,
             Bitmap inputAlbumArt
@@ -35,9 +30,9 @@ public class AudioFile {
     }
 
     // Overload without album art
-    public AudioFile (
-            String inputPath,
-            String inputName,
+    public AudioFile(
+            @NonNull String inputPath,
+            @NonNull String inputName,
             String inputArtist,
             String inputAlbum
     ) {
@@ -48,9 +43,9 @@ public class AudioFile {
     }
 
     // Overload without album
-    public AudioFile (
-            String inputPath,
-            String inputName,
+    public AudioFile(
+            @NonNull String inputPath,
+            @NonNull String inputName,
             String inputArtist
     ) {
         name = inputName;
@@ -60,9 +55,9 @@ public class AudioFile {
     }
 
     // Overload constructor for unknown artist/album audio files
-    public AudioFile (
-            String inputPath,
-            String inputName
+    public AudioFile(
+            @NonNull String inputPath,
+            @NonNull String inputName
     ) {
         name = inputName;
         artist = "Unknown Artist";
@@ -70,11 +65,33 @@ public class AudioFile {
         path = inputPath;
     }
 
-    public String getName() {return name;}
-    public String getArtist() {return artist;}
-    public String getAlbum() {return album;}
-    public Bitmap getAlbumArt() {return albumArt;}
-    public String getPath() {return path;}
-    public int getID() {return ID;}
-    public void setID(int inputID) {ID = inputID;}
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
+
+    public Bitmap getAlbumArt() {
+        return albumArt;
+    }
+
+    @NonNull
+    public String getPath() {
+        return path;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int inputID) {
+        ID = inputID;
+    }
 }
