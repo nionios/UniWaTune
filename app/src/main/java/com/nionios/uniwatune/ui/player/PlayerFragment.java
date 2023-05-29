@@ -1,7 +1,6 @@
 package com.nionios.uniwatune.ui.player;
 
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -75,19 +73,26 @@ public class PlayerFragment extends Fragment {
         // According to the state of the song (playing/not) set the appropriate drawable again.
         // This is on click of playerPlayButton on player
         binding.playerPlayButton.setOnClickListener(view -> {
-                localMediaPlayerController.toggleCurrentlyPlayingSongPlayState(getContext());
-                // According to the state of the song (playing/not) set the appropriate drawable.
-                Drawable appropriateDrawableOnClick;
-                if (localMediaPlayerController.isAudioPlaying()) {
-                    appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
-                            R.drawable.baseline_play_circle_24);
-                } else {
-                    appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
-                            R.drawable.baseline_pause_circle_24);
-                }
-                binding.playerPlayButton.setImageDrawable(appropriateDrawableOnClick);
+            localMediaPlayerController.toggleCurrentlyPlayingAudioFilePlayState(getContext());
+            // According to the state of the song (playing/not) set the appropriate drawable.
+            Drawable appropriateDrawableOnClick;
+            if (localMediaPlayerController.isAudioPlaying()) {
+                appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
+                        R.drawable.baseline_play_circle_24);
+            } else {
+                appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
+                        R.drawable.baseline_pause_circle_24);
             }
-        );
+            binding.playerPlayButton.setImageDrawable(appropriateDrawableOnClick);
+        });
+
+        binding.playerNextButton.setOnClickListener(view -> {
+            localMediaPlayerController.playNextAudioFile(getContext());
+        });
+
+        binding.playerPreviousButton.setOnClickListener(view -> {
+            localMediaPlayerController.playPreviousAudioFile(getContext());
+        });
         return root;
     }
 

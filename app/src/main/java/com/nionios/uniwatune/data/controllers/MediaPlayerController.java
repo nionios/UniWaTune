@@ -16,12 +16,32 @@ import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 public class MediaPlayerController {
     boolean isItBound;
     MediaPlayerService localMediaPlayerService;
+    final int TOGGLE_CURRENT_AUDIO_FILE_PLAY_STATE = 1;
+    final int PLAY_NEXT_AUDIO_FILE = 2;
+    final int PLAY_PREVIOUS_AUDIO_FILE = 3;
 
     /**
      * * @param context
      * Communicates with the service to pause or play the song currently playing
      */
-    public void toggleCurrentlyPlayingSongPlayState (Context context) {
+    public void toggleCurrentlyPlayingAudioFilePlayState(Context context) {
+        communicateWithService(context, TOGGLE_CURRENT_AUDIO_FILE_PLAY_STATE);
+    }
+
+    public void playNextAudioFile (Context context) {
+        communicateWithService(context, PLAY_NEXT_AUDIO_FILE);
+    }
+
+    public void playPreviousAudioFile (Context context) {
+        communicateWithService(context, PLAY_PREVIOUS_AUDIO_FILE);
+    }
+
+    /**
+     * Method that handles the binding to the service and runs the appropriate method on service.
+     * @param context - The appropriate Context
+     * @param internalCommand - The appropriate int that signals the wanted action of service
+     */
+    public void communicateWithService (Context context, int internalCommand) {
         // Make the new service connection and set isItBound flag appropriately.
         ServiceConnection localServiceConnection = new ServiceConnection() {
             @Override
@@ -30,7 +50,19 @@ public class MediaPlayerController {
                 MediaPlayerService.MediaPlayerServiceBinder serviceBinder =
                         (MediaPlayerService.MediaPlayerServiceBinder) iBinder ;
                 localMediaPlayerService = serviceBinder.getService();
-                localMediaPlayerService.toggleMediaPlayerPlayState();
+                // According to given command from previous methods, run diffent bound
+                // service method
+                switch (internalCommand) {
+                    case TOGGLE_CURRENT_AUDIO_FILE_PLAY_STATE:
+                        localMediaPlayerService.toggleMediaPlayerPlayState();
+                        break;
+                    case PLAY_NEXT_AUDIO_FILE:
+                        localMediaPlayerService.playNextAudioFile();
+                        break;
+                    case PLAY_PREVIOUS_AUDIO_FILE:
+                        localMediaPlayerService.playPreviousAudioFile();
+                        break;
+                }
                 isItBound = true;
             }
 
@@ -40,13 +72,10 @@ public class MediaPlayerController {
             }
         };
         // Make the new explicit intent for getting the current song.
-        Intent getCurrentSongIntent = new Intent(context, MediaPlayerService.class);
-        //getCurrentSongIntent.setAction("ACTION_GET_CURRENT_SONG");
-        //getCurrentSongIntent.setPackage("com.uniwatune");
-        boolean connected = false;
+        Intent communicationWithServiceIntent = new Intent(context, MediaPlayerService.class);
         //bind service is asynchronous, so we do not return anything
-        connected = context.bindService(
-                getCurrentSongIntent,
+        context.bindService(
+                communicationWithServiceIntent,
                 localServiceConnection,
                 // This is zero because service is running at this point.
                 0

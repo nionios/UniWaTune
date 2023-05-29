@@ -2,12 +2,17 @@ package com.nionios.uniwatune.data.singletons;
 
 import com.nionios.uniwatune.data.types.AudioFile;
 
+import java.io.LineNumberReader;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class AudioQueueStorage {
     private static AudioQueueStorage AUDIO_QUEUE_INSTANCE;
-    private Queue<AudioFile> AudioQueue = new LinkedList<>();
+    private LinkedList<AudioFile> AudioQueue = new LinkedList<>();
+    /* ShadowQueue is our silent navigator through all of the songs once on queue
+     * (previous ones too!) */
+    private LinkedList<AudioFile> ShadowQueue = new LinkedList<>();
     private AudioQueueStorage() {}
     // If isQueueActive is true, then the song on index 0 is currently playing
     private boolean isQueueActive;
@@ -19,12 +24,21 @@ public class AudioQueueStorage {
         return AUDIO_QUEUE_INSTANCE;
     }
 
-    public void setAudioQueue (Queue<AudioFile> inputAudioFileQueue) {
+    public void setAudioQueue (LinkedList<AudioFile> inputAudioFileQueue) {
         AudioQueue = inputAudioFileQueue;
     }
 
-    public Queue<AudioFile> getAudioQueue () {
+    public void setAudioAndShadowQueue (LinkedList<AudioFile> inputAudioFileQueue) {
+        AudioQueue = inputAudioFileQueue;
+        //When we set a whole new queue, we set the ShadowQueue too
+        ShadowQueue = inputAudioFileQueue;
+    }
+
+    public LinkedList<AudioFile> getAudioQueue () {
         return AudioQueue;
+    }
+    public LinkedList<AudioFile> getShadowQueue () {
+        return ShadowQueue;
     }
 
     public void addToAudioQueue (AudioFile inputAudioFile) {

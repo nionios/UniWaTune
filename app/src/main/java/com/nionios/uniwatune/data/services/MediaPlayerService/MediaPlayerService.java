@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Queue;
@@ -37,6 +38,9 @@ public class MediaPlayerService
     private static final String ACTION_PLAY = "com.uniwatune.action.PLAY";
     private static final String ACTION_TOGGLE_PLAY_STATE = "com.uniwatune.action.TOGGLE_PLAY_STATE";
     private static final int ONGOING_NOTIFICATION_ID = 13;
+
+    private final int SET_QUEUE_ONLY_FLAG = 1;
+    private final int SET_BOTH_QUEUE_AND_SHADOW_QUEUE_FLAG = 2;
     // Binder for giving info to clients
     private final IBinder binder = (IBinder) new MediaPlayerServiceBinder();
 
@@ -49,7 +53,7 @@ public class MediaPlayerService
     }
     public MediaPlayer getCurrentMediaPlayer() {return CurrentMediaPlayer;}
 
-    public Queue<AudioFile> trimQueue (Queue<AudioFile> inputQueue, String filePath) {
+    public LinkedList<AudioFile> trimQueue (LinkedList<AudioFile> inputQueue, String filePath) {
         while (inputQueue.iterator().hasNext()) {
             assert inputQueue.peek() != null;
             if (inputQueue.peek().getPath().compareTo(filePath) != 0) {
@@ -81,31 +85,8 @@ public class MediaPlayerService
                 // Get the audio file path from the extras
                 String inputAudioFilePath = (String) extras.get("PATH");
                 if (inputAudioFilePath != null) {
-                    System.out.println("Playing audio file with URI:" + Uri.parse(inputAudioFilePath));
-                    MediaPlayer localMediaPlayer =
-                            MediaPlayer.create( this, Uri.parse(inputAudioFilePath));
-                    /* Switch out any currently playing mediaPlayer with this one if they exist,
-                     * set this one as current. Also set the song as currently loaded on
-                     * our MediaPlayer*/
-                    setMediaPlayer(localMediaPlayer);
-                    // Get AudioScanned singleton instance so we are able to search for the file
-                    AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
-                    ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
-                    // The first (an only) match is our instantiated object on memory
-                    // TODO: set it as current song with setCurrentAudioFile or just front of queue?
-                    /*List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
-                            .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
-                            .collect(Collectors.toList());
-                    setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));*/
-                    // Cut off the queue up to the current audio file (no previous songs)
-                    Queue<AudioFile> NewQueue = new LinkedList<>(localAudioFileList);
-                    NewQueue = trimQueue(NewQueue, inputAudioFilePath);
-                    // Get the queue storage singleton and store the queue there.
-                    AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
-                    localAudioQueueStorage.setAudioQueue(NewQueue);
-                    localAudioQueueStorage.setIsQueueActive(true);
-                    // Start the media player finally
-                    localMediaPlayer.start();
+                    // We are playing a completely new file manually, set shadow queue too.
+                    playAudioFile(inputAudioFilePath, SET_BOTH_QUEUE_AND_SHADOW_QUEUE_FLAG);
                 }
             }
         }
@@ -129,9 +110,40 @@ public class MediaPlayerService
         }
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
+    public void playAudioFile (String inputAudioFilePath, int mode) {
+        System.out.println("Playing audio file with URI:" + Uri.parse(inputAudioFilePath));
+        MediaPlayer localMediaPlayer =
+                MediaPlayer.create( this, Uri.parse(inputAudioFilePath));
+        /* Switch out any currently playing mediaPlayer with this one if they exist,
+         * set this one as current. Also set the song as currently loaded on
+         * our MediaPlayer*/
+        setMediaPlayer(localMediaPlayer);
+        // Get AudioScanned singleton instance so we are able to search for the file
+        AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+        ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
+        // The first (an only) match is our instantiated object on memory
+        // TODO: set it as current song with setCurrentAudioFile or just front of queue?
+                    /*List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
+                            .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
+                            .collect(Collectors.toList());
+                    setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));*/
+        // Cut off the queue up to the current audio file (no previous songs)
+        LinkedList<AudioFile> NewQueue = new LinkedList<>(localAudioFileList);
+        NewQueue = trimQueue(NewQueue, inputAudioFilePath);
+        // Get the queue storage singleton and store the queue there.
+        AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+        switch (mode) {
+            case SET_QUEUE_ONLY_FLAG:
+                localAudioQueueStorage.setAudioQueue(NewQueue);
+                break;
+            case SET_BOTH_QUEUE_AND_SHADOW_QUEUE_FLAG:
+            default:
+                localAudioQueueStorage.setAudioAndShadowQueue(NewQueue);
+                break;
+        }
+        localAudioQueueStorage.setIsQueueActive(true);
+        // Start the media player finally
+        localMediaPlayer.start();
     }
 
     @Override
@@ -139,10 +151,10 @@ public class MediaPlayerService
         // Remove audio file that just played (it's in front of the queue)
         AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
         Queue<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
-        localAudioQueueInstance.remove();
         // Play audio file now in front of the queue, make sure the element is not zero
         try {
-            AudioFile nextAudioFileInQueue = localAudioQueueInstance.peek();
+            // TODO: peek or poll?
+            AudioFile nextAudioFileInQueue = localAudioQueueInstance.poll();
             assert nextAudioFileInQueue != null;
             mediaPlayer.setDataSource(nextAudioFileInQueue.getPath());
             // Set our variable too TODO: set this or nah?
@@ -177,6 +189,35 @@ public class MediaPlayerService
         }
     }
 
+    public void playNextAudioFile () {
+        AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+        Queue<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
+        // Remove already played file from queue. If queue is empty, stop playing anything
+        // TODO: signal user somehow?
+        if (localAudioQueueInstance.poll() == null) return;
+        AudioFile nextFile = localAudioQueueInstance.peek();
+        assert nextFile != null;
+        // Keep shadow queue intact to be able to go to previous song
+        playAudioFile(nextFile.getPath(), SET_QUEUE_ONLY_FLAG);
+    }
+
+    public void playPreviousAudioFile () {
+        AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+        /* On previous song, we are getting ShadowQueue too in order to access the audio files
+         * played in the past. */
+        LinkedList<AudioFile> localShadowQueueInstance = localAudioQueueStorage.getShadowQueue();
+        LinkedList<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
+        // Get the position of the file in the shadow queue based on the pos on the playing queue
+        int previousFilePosition = localShadowQueueInstance.indexOf(localAudioQueueInstance.peek()) - 1;
+        // TODO: let user know?
+        if (previousFilePosition < 0) return;
+        AudioFile previousFile =
+                localShadowQueueInstance.get(previousFilePosition);
+        assert previousFile != null;
+        // Keep shadow queue intact to be able to go to previous song
+        playAudioFile(previousFile.getPath(), SET_QUEUE_ONLY_FLAG);
+    }
+
     public void toggleMediaPlayerPlayState () {
         //Set the variable in the queue singleton and play/pause the audio
         AudioQueueStorage localAudioQueueStorageInstance = AudioQueueStorage.getInstance();
@@ -193,6 +234,11 @@ public class MediaPlayerService
         if (CurrentMediaPlayer != null) {
             CurrentMediaPlayer.start();
         }
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
     }
 
     /** Called when MediaPlayer is ready
