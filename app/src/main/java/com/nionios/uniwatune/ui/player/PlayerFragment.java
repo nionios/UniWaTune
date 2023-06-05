@@ -1,6 +1,8 @@
 package com.nionios.uniwatune.ui.player;
 
+import android.app.Activity;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.nionios.uniwatune.R;
@@ -88,10 +92,18 @@ public class PlayerFragment extends Fragment {
 
         binding.playerNextButton.setOnClickListener(view -> {
             localMediaPlayerController.playNextAudioFile(getContext());
+            Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
+                    R.drawable.baseline_pause_circle_24);
+            binding.playerPlayButton.setImageDrawable(pauseCircleButton);
+            playerViewModel.updateUI();
         });
 
         binding.playerPreviousButton.setOnClickListener(view -> {
             localMediaPlayerController.playPreviousAudioFile(getContext());
+            Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
+                    R.drawable.baseline_pause_circle_24);
+            binding.playerPlayButton.setImageDrawable(pauseCircleButton);
+            playerViewModel.updateUI();
         });
         return root;
     }

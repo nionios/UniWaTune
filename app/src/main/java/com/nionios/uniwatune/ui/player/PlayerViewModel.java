@@ -18,23 +18,40 @@ import java.util.Queue;
 /* AndroidViewModel is an Application context aware ViewModel.
  * We need it for communicating with the MediaPlayerService.*/
 public class PlayerViewModel extends AndroidViewModel {
-    private final MutableLiveData<String> mutableTransferAudioFileTitle;
-    private final MutableLiveData<String> mutableTransferAudioFileArtist;
-    private final MutableLiveData<String> mutableTransferAudioFileAlbum;
-    private final MutableLiveData<Bitmap> mutableTransferAudioFileAlbumArt;
+    private MutableLiveData<String> mutableTransferAudioFileTitle;
+    private MutableLiveData<String> mutableTransferAudioFileArtist;
+    private MutableLiveData<String> mutableTransferAudioFileAlbum;
+    private MutableLiveData<Bitmap> mutableTransferAudioFileAlbumArt;
 
-    public PlayerViewModel(Application application) {
-        super(application);
+    public AudioFile getFreshUIInfo () {
         // Get the currently playing song from the first position of our queue
         AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
         Queue<AudioFile> localAudioQueueInstance = localAudioQueueStorage.getAudioQueue();
         AudioFile localCurrentAudioFile = localAudioQueueInstance.peek();
+        return localCurrentAudioFile;
+    }
 
+    public void setUIInfo () {
+        AudioFile localCurrentAudioFile = getFreshUIInfo();
         assert localCurrentAudioFile != null;
         mutableTransferAudioFileTitle    = new MutableLiveData<>(localCurrentAudioFile.getName());
         mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());
         mutableTransferAudioFileAlbum    = new MutableLiveData<>(localCurrentAudioFile.getAlbum());
         mutableTransferAudioFileAlbumArt = new MutableLiveData<>(localCurrentAudioFile.getAlbumArt());
+    }
+
+    public PlayerViewModel(Application application) {
+        super(application);
+        setUIInfo();
+    }
+
+    public void updateUI () {
+        AudioFile localCurrentAudioFile = getFreshUIInfo();
+        assert localCurrentAudioFile != null;
+        mutableTransferAudioFileTitle.postValue(localCurrentAudioFile.getName());
+        mutableTransferAudioFileArtist.postValue(localCurrentAudioFile.getArtist());
+        mutableTransferAudioFileAlbum.postValue(localCurrentAudioFile.getAlbum());
+        mutableTransferAudioFileAlbumArt.postValue(localCurrentAudioFile.getAlbumArt());
     }
 
     public LiveData<String> getMutableAudioFileTitle() {
