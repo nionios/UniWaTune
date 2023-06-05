@@ -13,8 +13,8 @@
             android:icon="@drawable/folder"
             android:title="@string/menu_reflow" />
         <item
-            android:id="@+id/nav_albums"
+            android:id="@+id/nav_player"
             android:icon="@drawable/ic_slideshow_black_24dp"
-            android:title="@string/menu_albums" />
+            android:title="@string/menu_player" />
     </group>
 </menu>
