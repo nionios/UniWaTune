@@ -1,20 +1,18 @@
 package com.nionios.uniwatune.ui.player;
 
-import android.app.Activity;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.nionios.uniwatune.R;
@@ -95,15 +93,36 @@ public class PlayerFragment extends Fragment {
             Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
                     R.drawable.baseline_pause_circle_24);
             binding.playerPlayButton.setImageDrawable(pauseCircleButton);
-            playerViewModel.updateUI();
+            Animation slideOutLeftAnimation = AnimationUtils.loadAnimation(
+                    getContext(),
+                    R.anim.slide_out_left);
+            playerAlbumCoverImageView.startAnimation(slideOutLeftAnimation);
+            view.postDelayed(() -> {
+                playerViewModel.updateUI();
+                Animation slideInRight = AnimationUtils.loadAnimation(
+                        getContext(),
+                        R.anim.slide_in_right);
+                playerAlbumCoverImageView.startAnimation(slideInRight);
+            }, 600);
         });
 
         binding.playerPreviousButton.setOnClickListener(view -> {
             localMediaPlayerController.playPreviousAudioFile(getContext());
             Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
                     R.drawable.baseline_pause_circle_24);
+            Animation slideOutRightAnimation = AnimationUtils.loadAnimation(
+                    getContext(),
+                    android.R.anim.slide_out_right);
+            playerAlbumCoverImageView.startAnimation(slideOutRightAnimation);
             binding.playerPlayButton.setImageDrawable(pauseCircleButton);
-            playerViewModel.updateUI();
+            view.postDelayed(() -> {
+                playerViewModel.updateUI();
+                Animation slideInLeft = AnimationUtils.loadAnimation(
+                        getContext(),
+                        android.R.anim.slide_in_left);
+                playerAlbumCoverImageView.startAnimation(slideInLeft);
+            }, 600);
+
         });
         return root;
     }
@@ -115,7 +134,7 @@ public class PlayerFragment extends Fragment {
     }
 
     /*
-    //TODO Does not work lol
+    //TODO Does not work
     @Override
     public void onBackPressed(View view) {
         NavController navController =

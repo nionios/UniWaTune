@@ -240,11 +240,4 @@ public class MediaPlayerService
     public IBinder onBind(Intent intent) {
         return binder;
     }
-
-    /** Called when MediaPlayer is ready
-    public void onPrepared(MediaPlayer player) {
-        player.start();
-    }
-     */
-
 }

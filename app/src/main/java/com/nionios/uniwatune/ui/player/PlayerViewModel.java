@@ -1,14 +1,12 @@
 package com.nionios.uniwatune.ui.player;
 
 import android.app.Application;
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.types.AudioFile;
 
@@ -35,8 +33,8 @@ public class PlayerViewModel extends AndroidViewModel {
         AudioFile localCurrentAudioFile = getFreshUIInfo();
         assert localCurrentAudioFile != null;
         mutableTransferAudioFileTitle    = new MutableLiveData<>(localCurrentAudioFile.getName());
-        mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());
         mutableTransferAudioFileAlbum    = new MutableLiveData<>(localCurrentAudioFile.getAlbum());
+        mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());
         mutableTransferAudioFileAlbumArt = new MutableLiveData<>(localCurrentAudioFile.getAlbumArt());
     }
 
@@ -48,10 +46,10 @@ public class PlayerViewModel extends AndroidViewModel {
     public void updateUI () {
         AudioFile localCurrentAudioFile = getFreshUIInfo();
         assert localCurrentAudioFile != null;
-        mutableTransferAudioFileTitle.postValue(localCurrentAudioFile.getName());
-        mutableTransferAudioFileArtist.postValue(localCurrentAudioFile.getArtist());
-        mutableTransferAudioFileAlbum.postValue(localCurrentAudioFile.getAlbum());
-        mutableTransferAudioFileAlbumArt.postValue(localCurrentAudioFile.getAlbumArt());
+        mutableTransferAudioFileTitle    .postValue(localCurrentAudioFile.getName());
+        mutableTransferAudioFileAlbum    .postValue(localCurrentAudioFile.getAlbum());
+        mutableTransferAudioFileArtist   .postValue(localCurrentAudioFile.getArtist());
+        mutableTransferAudioFileAlbumArt .postValue(localCurrentAudioFile.getAlbumArt());
     }
 
     public LiveData<String> getMutableAudioFileTitle() {
