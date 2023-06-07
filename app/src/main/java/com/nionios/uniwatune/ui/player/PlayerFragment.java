@@ -35,7 +35,7 @@ public class PlayerFragment extends Fragment {
         int seconds = (timeInMilliseconds / 1000) % 60;
         String timestamp;
         // If seconds are not 2 digits prepend a 0.
-        if (seconds > 10) {
+        if (seconds > 9) {
             timestamp = minutes + ":" + seconds;
         } else {
             timestamp = minutes + ":0" + seconds;
@@ -92,6 +92,7 @@ public class PlayerFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void updateSeekBar() {
         SeekBar seekbar = binding.seekBar;
+        initializeSeekBar();
         refreshSeekBar();
         seekbar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
