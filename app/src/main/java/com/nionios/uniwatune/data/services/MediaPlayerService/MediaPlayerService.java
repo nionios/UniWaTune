@@ -8,9 +8,11 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.SeekBar;
 
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
+import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import java.io.IOException;
@@ -111,7 +113,6 @@ public class MediaPlayerService
     }
 
     public void playAudioFile (String inputAudioFilePath, int mode) {
-        System.out.println("Playing audio file with URI:" + Uri.parse(inputAudioFilePath));
         MediaPlayer localMediaPlayer =
                 MediaPlayer.create( this, Uri.parse(inputAudioFilePath));
         /* Switch out any currently playing mediaPlayer with this one if they exist,
@@ -171,8 +172,11 @@ public class MediaPlayerService
 
     // If there is a mediaPlayer active, release it and set the new one as current.
     public void setMediaPlayer (MediaPlayer inputMediaPlayer) {
-        if (CurrentMediaPlayer == null) CurrentMediaPlayer = inputMediaPlayer;
-        else {
+        MediaPlayerStorage localMediaPlayerStorage = MediaPlayerStorage.getInstance();
+        if (CurrentMediaPlayer == null) {
+            CurrentMediaPlayer = inputMediaPlayer;
+            localMediaPlayerStorage.setMediaPlayer(inputMediaPlayer);
+        } else {
             CurrentMediaPlayer.release();
             CurrentMediaPlayer = null;
             this.setMediaPlayer(inputMediaPlayer);

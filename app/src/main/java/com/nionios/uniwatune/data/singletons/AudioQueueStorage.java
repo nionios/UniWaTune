@@ -1,11 +1,16 @@
 package com.nionios.uniwatune.data.singletons;
 
+import androidx.annotation.NonNull;
+
 import com.nionios.uniwatune.data.types.AudioFile;
+
+import org.jetbrains.annotations.Contract;
 
 import java.io.LineNumberReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 public class AudioQueueStorage {
     private static AudioQueueStorage AUDIO_QUEUE_INSTANCE;
@@ -28,10 +33,16 @@ public class AudioQueueStorage {
         AudioQueue = inputAudioFileQueue;
     }
 
+    // Function to convert an array list to a linked list
+    private static <T> List<T> convertALtoLL(List<T> aL) {
+        return new LinkedList<>(aL);
+    }
+
     public void setAudioAndShadowQueue (LinkedList<AudioFile> inputAudioFileQueue) {
         AudioQueue = inputAudioFileQueue;
-        //When we set a whole new queue, we set the ShadowQueue too
-        ShadowQueue = inputAudioFileQueue;
+        // When we set a whole new queue, we set the ShadowQueue too with AudioScanned list
+        AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+        ShadowQueue = (LinkedList<AudioFile>) convertALtoLL(localAudioScannedInstance.getAudioFileList());
     }
 
     public LinkedList<AudioFile> getAudioQueue () {

@@ -2,6 +2,7 @@ package com.nionios.uniwatune.ui.player;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -10,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,13 +23,106 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
+import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
 public class PlayerFragment extends Fragment {
 
     private FragmentPlayerBinding binding;
 
-    @SuppressLint("ClickableViewAccessibility")
+    private String timestampMaker(int timeInMilliseconds) {
+        int minutes = (timeInMilliseconds / 1000) / 60;
+        int seconds = (timeInMilliseconds / 1000) % 60;
+        String timestamp;
+        // If seconds are not 2 digits prepend a 0.
+        if (seconds > 10) {
+            timestamp = minutes + ":" + seconds;
+        } else {
+            timestamp = minutes + ":0" + seconds;
+        }
+        return timestamp;
+    }
+
+    /* Handy function that handles the UI elements that signal the transition from an AudioFile to
+     * another.*/
+    private void changeAudioFileUISequence(
+            ImageButton triggeredButton,
+            View view,
+            Animation previousAudioFileAnimation,
+            Animation nextAudioFileAnimation) {
+        // Initialize our pulse animation
+        Animation pulseAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.pulse);
+        // As audio starts playing, make the play button reflect that (switch to click to pause)
+        Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
+                R.drawable.baseline_pause_circle_24);
+        // Get our playerViewModel provider to signal change of UI infos
+        PlayerViewModel playerViewModel =
+                new ViewModelProvider(this).get(PlayerViewModel.class);
+        binding.playerPlayButton.setImageDrawable(pauseCircleButton);
+        // Signal to user button is pressed with our pulse animation
+        triggeredButton.startAnimation(pulseAnimation);
+        binding.playerAlbumCoverImageView.startAnimation(previousAudioFileAnimation);
+        initializeSeekBar();
+        view.postDelayed(() -> {
+            playerViewModel.updateUI();
+            binding.playerAlbumCoverImageView.startAnimation(nextAudioFileAnimation);
+        }, 400);
+    }
+
+    private void initializeSeekBar() {
+        SeekBar seekbar = binding.seekBar;
+        seekbar.setProgress(0, true);
+        binding.timestamp.setText("0:00");
+    }
+
+    // This function refreshes the info the seekbar has in order for the user to act upon it
+    private void refreshSeekBar() {
+        SeekBar seekbar = binding.seekBar;
+        MediaPlayerStorage localMediaPlayerStorage = MediaPlayerStorage.getInstance();
+        // Set the max on the seek bar from the duration of the current song, then on textView
+        MediaPlayer currentMediaPlayer = localMediaPlayerStorage.getMediaPlayer();
+        int fetchedDuration = currentMediaPlayer.getDuration();
+        System.out.println("Fetched duration is: " + fetchedDuration);
+        // Convert the fetchedDuration (it's in milliseconds) into minutes and seconds.
+        binding.duration.setText(timestampMaker(fetchedDuration));
+        // The seekbar's max is in milliseconds, set that normally
+        seekbar.setMax(fetchedDuration);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateSeekBar() {
+        SeekBar seekbar = binding.seekBar;
+        refreshSeekBar();
+        seekbar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    // When the progress value has changed
+                    @Override
+                    public void onProgressChanged(
+                            SeekBar seekBar,
+                            int progress,
+                            boolean fromUser) {
+                        // Re-fetch media player and refresh info every time on progress
+                        refreshSeekBar();
+                        MediaPlayerStorage localMediaPlayerStorage = MediaPlayerStorage.getInstance();
+                        MediaPlayer currentMediaPlayer = localMediaPlayerStorage.getMediaPlayer();
+                        // Change the seek bar and seek to desired timestamp
+                        int currentProgress = seekBar.getProgress();
+                        binding.timestamp.setText(timestampMaker(currentProgress));
+                        currentMediaPlayer.seekTo(currentProgress);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+    }
+
+
+    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
@@ -75,9 +171,7 @@ public class PlayerFragment extends Fragment {
                     R.drawable.baseline_play_circle_24);
         }
         binding.playerPlayButton.setImageDrawable(appropriateDrawableInitial);
-
-        // Initializing pulse and quickpulse animation for some buttons
-        Animation pulseAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.pulse);
+        // Initializing quickpulse animation for some buttons
         Animation quickPulseAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.quickpulse);
         // Signal the service to start/stop the song on click.
         // According to the state of the song (playing/not) set the appropriate drawable again.
@@ -97,47 +191,35 @@ public class PlayerFragment extends Fragment {
             binding.playerPlayButton.setImageDrawable(appropriateDrawableOnClick);
         });
 
+        // Click listeners on both the previous and the next audio file buttons.
         binding.playerNextButton.setOnClickListener(view -> {
             localMediaPlayerController.playNextAudioFile(getContext());
-            Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
-                    R.drawable.baseline_pause_circle_24);
-            binding.playerPlayButton.setImageDrawable(pauseCircleButton);
-            // Signal to user button is pressed
-            binding.playerNextButton.startAnimation(pulseAnimation);
-
             Animation slideOutLeftAnimation = AnimationUtils.loadAnimation(
                     getContext(),
                     R.anim.slide_out_left);
-            playerAlbumCoverImageView.startAnimation(slideOutLeftAnimation);
-            view.postDelayed(() -> {
-                playerViewModel.updateUI();
-                Animation slideInRight = AnimationUtils.loadAnimation(
-                        getContext(),
-                        R.anim.slide_in_right);
-                playerAlbumCoverImageView.startAnimation(slideInRight);
-            }, 400);
+            Animation slideInRightAnimation = AnimationUtils.loadAnimation(
+                    getContext(),
+                    R.anim.slide_in_right);
+            changeAudioFileUISequence(
+                    binding.playerNextButton,
+                    view,
+                    slideOutLeftAnimation,
+                    slideInRightAnimation);
         });
 
         binding.playerPreviousButton.setOnClickListener(view -> {
             localMediaPlayerController.playPreviousAudioFile(getContext());
-            Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
-                    R.drawable.baseline_pause_circle_24);
-            // Signal to user button is pressed
-            binding.playerPreviousButton.startAnimation(pulseAnimation);
-
             Animation slideOutRightAnimation = AnimationUtils.loadAnimation(
                     getContext(),
                     android.R.anim.slide_out_right);
-            playerAlbumCoverImageView.startAnimation(slideOutRightAnimation);
-            binding.playerPlayButton.setImageDrawable(pauseCircleButton);
-            view.postDelayed(() -> {
-                playerViewModel.updateUI();
-                Animation slideInLeft = AnimationUtils.loadAnimation(
-                        getContext(),
-                        android.R.anim.slide_in_left);
-                playerAlbumCoverImageView.startAnimation(slideInLeft);
-            }, 400);
-
+            Animation slideInLeftAnimation = AnimationUtils.loadAnimation(
+                    getContext(),
+                    android.R.anim.slide_in_left);
+            changeAudioFileUISequence(
+                    binding.playerNextButton,
+                    view,
+                    slideOutRightAnimation,
+                    slideInLeftAnimation);
         });
 
         // TODO: revisit this, does not work at all.
@@ -171,6 +253,8 @@ public class PlayerFragment extends Fragment {
         );
 
         playerAlbumCoverImageView.setOnTouchListener((view, event) -> gesture.onTouchEvent(event));
+
+        updateSeekBar();
         return root;
     }
 
