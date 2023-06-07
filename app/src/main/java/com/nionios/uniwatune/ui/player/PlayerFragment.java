@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -23,25 +24,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
+import com.nionios.uniwatune.data.helpers.TimestampMaker;
 import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
 public class PlayerFragment extends Fragment {
 
     private FragmentPlayerBinding binding;
-
-    private String timestampMaker(int timeInMilliseconds) {
-        int minutes = (timeInMilliseconds / 1000) / 60;
-        int seconds = (timeInMilliseconds / 1000) % 60;
-        String timestamp;
-        // If seconds are not 2 digits prepend a 0.
-        if (seconds > 9) {
-            timestamp = minutes + ":" + seconds;
-        } else {
-            timestamp = minutes + ":0" + seconds;
-        }
-        return timestamp;
-    }
 
     /* Handy function that handles the UI elements that signal the transition from an AudioFile to
      * another.*/
@@ -69,6 +58,20 @@ public class PlayerFragment extends Fragment {
         }, 400);
     }
 
+    private void createSeekBarUpdateRunnable () {
+        Handler mHandler = new Handler();
+        PlayerViewModel playerViewModel =
+                new ViewModelProvider(this).get(PlayerViewModel.class);
+        //Update seekbar every 1 second through the playerViewModel.
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                playerViewModel.updateSeekBar();
+                mHandler.postDelayed(this, 1000);
+            }
+        });
+    }
+
     private void initializeSeekBar() {
         SeekBar seekbar = binding.seekBar;
         seekbar.setProgress(0, true);
@@ -84,7 +87,8 @@ public class PlayerFragment extends Fragment {
         int fetchedDuration = currentMediaPlayer.getDuration();
         System.out.println("Fetched duration is: " + fetchedDuration);
         // Convert the fetchedDuration (it's in milliseconds) into minutes and seconds.
-        binding.duration.setText(timestampMaker(fetchedDuration));
+        TimestampMaker timestampMaker = new TimestampMaker();
+        binding.duration.setText(timestampMaker.convertMillisecondsToTimestamp(fetchedDuration));
         // The seekbar's max is in milliseconds, set that normally
         seekbar.setMax(fetchedDuration);
     }
@@ -96,29 +100,31 @@ public class PlayerFragment extends Fragment {
         refreshSeekBar();
         seekbar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
-                    // When the progress value has changed
                     @Override
                     public void onProgressChanged(
                             SeekBar seekBar,
                             int progress,
                             boolean fromUser) {
-                        // Re-fetch media player and refresh info every time on progress
-                        refreshSeekBar();
-                        MediaPlayerStorage localMediaPlayerStorage = MediaPlayerStorage.getInstance();
-                        MediaPlayer currentMediaPlayer = localMediaPlayerStorage.getMediaPlayer();
-                        // Change the seek bar and seek to desired timestamp
-                        int currentProgress = seekBar.getProgress();
-                        binding.timestamp.setText(timestampMaker(currentProgress));
-                        currentMediaPlayer.seekTo(currentProgress);
+                        // Only respond when user is moving the bar
+                        if (fromUser) {
+                            // Re-fetch media player and refresh info every time on progress
+                            refreshSeekBar();
+                            MediaPlayerStorage localMediaPlayerStorage = MediaPlayerStorage.getInstance();
+                            MediaPlayer currentMediaPlayer = localMediaPlayerStorage.getMediaPlayer();
+                            // Change the seek bar and seek to desired timestamp
+                            int currentProgress = seekBar.getProgress();
+                            TimestampMaker timestampMaker = new TimestampMaker();
+                            binding.timestamp.setText(
+                                    timestampMaker.convertMillisecondsToTimestamp(currentProgress));
+                            currentMediaPlayer.seekTo(currentProgress);
+                        }
                     }
 
                     @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
+                    public void onStartTrackingTouch(SeekBar seekBar) {}
 
                     @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                    }
+                    public void onStopTrackingTouch(SeekBar seekBar) {}
                 });
     }
 
@@ -152,6 +158,11 @@ public class PlayerFragment extends Fragment {
         playerViewModel.getMutableAudioFileAlbumArt().observe(
                 getViewLifecycleOwner(),
                 playerAlbumCoverImageView::setImageBitmap
+        );
+        final TextView timestamp = binding.timestamp;
+        playerViewModel.getMutableTimestamp().observe(
+                getViewLifecycleOwner(),
+                timestamp::setText
         );
 
         // Make text scroll when it overflows
@@ -206,7 +217,7 @@ public class PlayerFragment extends Fragment {
                     view,
                     slideOutLeftAnimation,
                     slideInRightAnimation);
-        });
+         });
 
         binding.playerPreviousButton.setOnClickListener(view -> {
             localMediaPlayerController.playPreviousAudioFile(getContext());
@@ -256,6 +267,8 @@ public class PlayerFragment extends Fragment {
         playerAlbumCoverImageView.setOnTouchListener((view, event) -> gesture.onTouchEvent(event));
 
         updateSeekBar();
+        createSeekBarUpdateRunnable();
+
         return root;
     }
 
