@@ -1,7 +1,9 @@
 package com.nionios.uniwatune.data.services.MediaPlayerService;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -72,9 +74,10 @@ public class MediaPlayerService
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Make the placeholder notification through our notification factory
         MediaPlayerServiceNotificationFactory notificationFactory =
                 new MediaPlayerServiceNotificationFactory();
-        Notification createdNotification = notificationFactory.makeNotification(this);
+        Notification createdNotification = notificationFactory.makePlaceHolderNotification(this);
         // Notification ID cannot be 0.
         startForeground(ONGOING_NOTIFICATION_ID, createdNotification);
 
@@ -100,7 +103,6 @@ public class MediaPlayerService
                 //TODO something?
             }
         }
-
         // Sticky service!
         return START_STICKY;
     }
@@ -145,6 +147,12 @@ public class MediaPlayerService
         localAudioQueueStorage.setIsQueueActive(true);
         // Start the media player finally
         localMediaPlayer.start();
+        //Update the placeholder notification now that we have updated info for the song.
+        MediaPlayerServiceNotificationFactory notificationFactory =
+                new MediaPlayerServiceNotificationFactory();
+        Notification updatedNotification = notificationFactory.makeNotification(this);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(ONGOING_NOTIFICATION_ID, updatedNotification);
     }
 
     @Override
