@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
+import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
@@ -28,7 +30,7 @@ public class MediaPlayerServiceNotificationFactory {
         PendingIntent pendingIntent = makePendingIntent(context);
         // Build the notification
         Notification notification = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Get the layout to use in the custom notification
             RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.audio_player_notification);
             // RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_large);
@@ -38,6 +40,14 @@ public class MediaPlayerServiceNotificationFactory {
             notificationLayout.setTextViewText(R.id.notification_title_text_view,  currentAudioFile.getName());
             notificationLayout.setTextViewText(R.id.notification_artist_text_view, currentAudioFile.getArtist());
             notificationLayout.setImageViewBitmap(R.id.notification_album_image,   currentAudioFile.getAlbumArt());
+
+            Intent toggleIntent = new Intent(context, MediaPlayerServiceNotificationFactory.class);
+            toggleIntent.setAction("toggle_song_play_state");
+            PendingIntent broadcastIntent = PendingIntent.getBroadcast(
+                    context,
+                    0, toggleIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            notificationLayout.setOnClickPendingIntent(R.id.notification_play_button, broadcastIntent);
 
             notification = new Notification.Builder(context, CHANNEL_DEFAULT_IMPORTANCE)
                     // .setContentTitle(context.getText(R.string.notification_title))

@@ -4,11 +4,11 @@
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="darkteal">#FF004746</color>
+    <color name="teal_700">#FF777777</color>
+    <color name="darkteal">#238EE3</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="blue">#FF074068</color>
-    <color name="darkblue">#FF001341</color>
-    <color name="lightblue">#FF175078</color>
+    <color name="blue">#FF001242</color>
+    <color name="darkblue">#FF000022</color>
+    <color name="lightblue">#FF0094C6</color>
 </resources>
