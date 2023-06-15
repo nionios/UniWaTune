@@ -8,23 +8,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
-import androidx.core.app.NotificationCompat;
 
 import com.nionios.uniwatune.R;
+import com.nionios.uniwatune.data.broadcast.NotificationBroadcastReceiver;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.types.AudioFile;
-
-import java.net.ConnectException;
 
 public class MediaPlayerServiceNotificationFactory {
     private static final String CHANNEL_DEFAULT_IMPORTANCE = "MediaPlayerServiceNotificationChannel";
 
     /**
-     * @description This is where we make our notification with the info of the song
-     * @param context
-     * @return
+     * This is where we make our notification with the info of the song
      */
     public Notification makeNotification (Context context) {
         PendingIntent pendingIntent = makePendingIntent(context);
@@ -41,15 +36,19 @@ public class MediaPlayerServiceNotificationFactory {
             notificationLayout.setTextViewText(R.id.notification_artist_text_view, currentAudioFile.getArtist());
             notificationLayout.setImageViewBitmap(R.id.notification_album_image,   currentAudioFile.getAlbumArt());
 
-            Intent toggleIntent = new Intent(context, MediaPlayerServiceNotificationFactory.class);
-            toggleIntent.setAction("toggle_song_play_state");
+            // Make an intent with the action that toggles the song play state from service
+            Intent toggleIntent = new Intent(context, NotificationBroadcastReceiver.class);
+            // toggleIntent.setAction("UNIWATUNE_NOTIFICATION_BROADCAST");
             PendingIntent broadcastIntent = PendingIntent.getBroadcast(
                     context,
-                    0, toggleIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    NotificationBroadcastReceiver.REQUEST_CODE_NOTIFICATION,
+                    toggleIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+            );
             notificationLayout.setOnClickPendingIntent(R.id.notification_play_button, broadcastIntent);
 
-            notification = new Notification.Builder(context, CHANNEL_DEFAULT_IMPORTANCE)
+            notification = new Notification.Builder(
+                    context.getApplicationContext(), CHANNEL_DEFAULT_IMPORTANCE)
                     // .setContentTitle(context.getText(R.string.notification_title))
                     // .setContentText(context.getText(R.string.notification_message))
                     .setContentIntent(pendingIntent)
@@ -63,7 +62,7 @@ public class MediaPlayerServiceNotificationFactory {
     }
 
     /**
-     * @description This is where we make our placeholder notification until the song is on the
+     * This is where we make our placeholder notification until the song is on the
      * mediaPlayer, then replace with real notification.
      * @param context
      * @return

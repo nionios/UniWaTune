@@ -18,11 +18,13 @@
         android:layout_toEndOf="@+id/notification_previous_button"
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
+        android:clickable="true"
         android:minWidth="0pt"
         android:padding="0pt"
         android:scaleType="fitCenter"
         android:src="@drawable/baseline_pause_circle_24"
-        app:tint="?attr/colorPrimary" />
+        app:tint="?attr/colorPrimary"
+        android:focusable="true" />
 
     <ImageButton
         android:id="@+id/notification_previous_button"

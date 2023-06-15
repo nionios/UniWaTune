@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -12,6 +13,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.SeekBar;
 
+import androidx.core.content.ContextCompat;
+
+import com.nionios.uniwatune.data.broadcast.NotificationBroadcastReceiver;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
@@ -74,6 +78,18 @@ public class MediaPlayerService
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+/*
+        // Register a broadcast receiver to receive intents from notifications
+        NotificationBroadcastReceiver notificationBroadcastReceiver =
+                new NotificationBroadcastReceiver();
+        IntentFilter filter = new IntentFilter("UNIWATUNE_NOTIFICATION_BROADCAST");
+        int receiverFlags = ContextCompat.RECEIVER_NOT_EXPORTED;
+        ContextCompat.registerReceiver(
+                getApplicationContext(),
+                notificationBroadcastReceiver,
+                filter,
+                receiverFlags);
+*/
         // Make the placeholder notification through our notification factory
         MediaPlayerServiceNotificationFactory notificationFactory =
                 new MediaPlayerServiceNotificationFactory();
