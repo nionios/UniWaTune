@@ -18,6 +18,31 @@ import com.nionios.uniwatune.data.types.AudioFile;
 public class MediaPlayerServiceNotificationFactory {
     private static final String CHANNEL_DEFAULT_IMPORTANCE = "MediaPlayerServiceNotificationChannel";
 
+    // Helper function to set a pending intent on click
+    private void onClickPendingIntentSetter (
+            Context context,
+            RemoteViews notificationLayout,
+            String inputAction,
+            int inputViewId){
+        // Make an intent with the action that toggles the song play state from service
+        Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
+        intent.setAction(inputAction);
+        PendingIntent broadcastIntent = PendingIntent.getBroadcast(
+                context,
+                NotificationBroadcastReceiver.REQUEST_CODE_NOTIFICATION,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        notificationLayout.setOnClickPendingIntent(inputViewId, broadcastIntent);
+    }
+
+    // Set all the notification listeners on notification with one function
+    private void setNotificationListeners (Context context, RemoteViews notificationLayout) {
+        onClickPendingIntentSetter(context, notificationLayout, "NOTIFICATION_ACTION_TOGGLE", R.id.notification_play_button);
+        onClickPendingIntentSetter(context, notificationLayout, "NOTIFICATION_ACTION_NEXT", R.id.notification_next_button);
+        onClickPendingIntentSetter(context, notificationLayout, "NOTIFICATION_ACTION_PREVIOUS", R.id.notification_previous_button);
+    }
+
     /**
      * This is where we make our notification with the info of the song
      */
@@ -35,18 +60,9 @@ public class MediaPlayerServiceNotificationFactory {
             notificationLayout.setTextViewText(R.id.notification_title_text_view,  currentAudioFile.getName());
             notificationLayout.setTextViewText(R.id.notification_artist_text_view, currentAudioFile.getArtist());
             notificationLayout.setImageViewBitmap(R.id.notification_album_image,   currentAudioFile.getAlbumArt());
-
-            // Make an intent with the action that toggles the song play state from service
-            Intent toggleIntent = new Intent(context, NotificationBroadcastReceiver.class);
-            // toggleIntent.setAction("UNIWATUNE_NOTIFICATION_BROADCAST");
-            PendingIntent broadcastIntent = PendingIntent.getBroadcast(
-                    context,
-                    NotificationBroadcastReceiver.REQUEST_CODE_NOTIFICATION,
-                    toggleIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT
-            );
-            notificationLayout.setOnClickPendingIntent(R.id.notification_play_button, broadcastIntent);
-
+            // Set the listeners for the media buttons
+            setNotificationListeners(context, notificationLayout);
+            // Build the notification through notification builder
             notification = new Notification.Builder(
                     context.getApplicationContext(), CHANNEL_DEFAULT_IMPORTANCE)
                     // .setContentTitle(context.getText(R.string.notification_title))
