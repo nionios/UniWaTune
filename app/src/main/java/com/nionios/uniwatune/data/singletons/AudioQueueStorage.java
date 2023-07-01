@@ -2,6 +2,7 @@ package com.nionios.uniwatune.data.singletons;
 
 import androidx.annotation.NonNull;
 
+import com.nionios.uniwatune.data.observables.GlobalCurrentAudioFile;
 import com.nionios.uniwatune.data.types.AudioFile;
 
 import org.jetbrains.annotations.Contract;
@@ -31,6 +32,8 @@ public class AudioQueueStorage {
 
     public void setAudioQueue (LinkedList<AudioFile> inputAudioFileQueue) {
         AudioQueue = inputAudioFileQueue;
+        GlobalCurrentAudioFile globalCurrentAudioFile = GlobalCurrentAudioFile.getInstance();
+        globalCurrentAudioFile.updateCurrentAudioFile(inputAudioFileQueue.peek());
     }
 
     // Function to convert an array list to a linked list

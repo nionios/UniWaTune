@@ -53,7 +53,7 @@ public class PlayerFragment extends Fragment {
         binding.playerAlbumCoverImageView.startAnimation(previousAudioFileAnimation);
         initializeSeekBar();
         view.postDelayed(() -> {
-            playerViewModel.updateUI();
+           // playerViewModel.updateUI();
             binding.playerAlbumCoverImageView.startAnimation(nextAudioFileAnimation);
         }, 400);
     }
@@ -130,6 +130,7 @@ public class PlayerFragment extends Fragment {
 
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
@@ -137,6 +138,7 @@ public class PlayerFragment extends Fragment {
                 new ViewModelProvider(this).get(PlayerViewModel.class);
 
         binding = FragmentPlayerBinding.inflate(inflater, container, false);
+
         View root = binding.getRoot();
 
         final TextView playerTitleTextView = binding.playerTitleTextView;
@@ -206,32 +208,12 @@ public class PlayerFragment extends Fragment {
         // Click listeners on both the previous and the next audio file buttons.
         binding.playerNextButton.setOnClickListener(view -> {
             localMediaPlayerController.playNextAudioFile(getContext());
-            Animation slideOutLeftAnimation = AnimationUtils.loadAnimation(
-                    getContext(),
-                    R.anim.slide_out_left);
-            Animation slideInRightAnimation = AnimationUtils.loadAnimation(
-                    getContext(),
-                    R.anim.slide_in_right);
-            changeAudioFileUISequence(
-                    binding.playerNextButton,
-                    view,
-                    slideOutLeftAnimation,
-                    slideInRightAnimation);
+            playNextAudioFileAnimations();
          });
 
         binding.playerPreviousButton.setOnClickListener(view -> {
             localMediaPlayerController.playPreviousAudioFile(getContext());
-            Animation slideOutRightAnimation = AnimationUtils.loadAnimation(
-                    getContext(),
-                    android.R.anim.slide_out_right);
-            Animation slideInLeftAnimation = AnimationUtils.loadAnimation(
-                    getContext(),
-                    android.R.anim.slide_in_left);
-            changeAudioFileUISequence(
-                    binding.playerNextButton,
-                    view,
-                    slideOutRightAnimation,
-                    slideInLeftAnimation);
+            playPreviousAudioFileAnimations();
         });
 
         // TODO: revisit this, does not work at all.
@@ -270,6 +252,36 @@ public class PlayerFragment extends Fragment {
         createSeekBarUpdateRunnable();
 
         return root;
+    }
+
+    public void playNextAudioFileAnimations () {
+        View view = getView();
+        Animation slideOutLeftAnimation = AnimationUtils.loadAnimation(
+                getContext(),
+                R.anim.slide_out_left);
+        Animation slideInRightAnimation = AnimationUtils.loadAnimation(
+                getContext(),
+                R.anim.slide_in_right);
+        changeAudioFileUISequence(
+                binding.playerNextButton,
+                view,
+                slideOutLeftAnimation,
+                slideInRightAnimation);
+    }
+
+    public void playPreviousAudioFileAnimations () {
+        View view = getView();
+        Animation slideOutRightAnimation = AnimationUtils.loadAnimation(
+                getContext(),
+                android.R.anim.slide_out_right);
+        Animation slideInLeftAnimation = AnimationUtils.loadAnimation(
+                getContext(),
+                android.R.anim.slide_in_left);
+        changeAudioFileUISequence(
+                binding.playerNextButton,
+                view,
+                slideOutRightAnimation,
+                slideInLeftAnimation);
     }
 
     @Override

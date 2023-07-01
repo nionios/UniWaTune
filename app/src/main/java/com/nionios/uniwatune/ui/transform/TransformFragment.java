@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -171,8 +169,7 @@ public class TransformFragment extends Fragment {
         private final ImageView imageView;
         private final TextView artistNameTextView;
         private final TextView albumNameTextView;
-        private final TextView titleTextView;
-        private int fileID;
+        private final TextView titleTextView;private int fileID;
 
         public TransformViewHolder(ItemTransformBinding binding) {
             super(binding.getRoot());
@@ -194,7 +191,10 @@ public class TransformFragment extends Fragment {
              *  lifting of communication with the MediaPlayerService */
             String clickedFilePath = localAudioScannedInstance.getAudioFile(this.fileID).getPath();
             MediaPlayerController localMediaPlayerController = new MediaPlayerController();
-            localMediaPlayerController.playSelectedAudioFile(view, clickedFilePath);
+            localMediaPlayerController.playSelectedAudioFile(
+                    view,
+                    clickedFilePath
+            );
             NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_nav_transform_to_nav_player);
         }

@@ -8,7 +8,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import com.nionios.uniwatune.data.helpers.TimestampMaker;
+import com.nionios.uniwatune.data.observables.GlobalCurrentAudioFile;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
 import com.nionios.uniwatune.data.types.AudioFile;
@@ -48,11 +52,20 @@ public class PlayerViewModel extends AndroidViewModel {
         mutableTransferAudioFileArtist   = new MutableLiveData<>(localCurrentAudioFile.getArtist());
         mutableTransferAudioFileAlbumArt = new MutableLiveData<>(localCurrentAudioFile.getAlbumArt());
         mutableTransferTimeStamp         = new MutableLiveData<>("0:00");
+        GlobalCurrentAudioFile globalCurrentAudioFile = GlobalCurrentAudioFile.getInstance();
+        globalCurrentAudioFile.addObserver(new PlayerAudioFileObserver());
     }
 
     public PlayerViewModel(Application application) {
         super(application);
         setUIInfo();
+    }
+
+    public class PlayerAudioFileObserver implements Observer {
+        @Override
+        public void update(Observable observable, Object o) {
+            updateUI();
+        }
     }
 
     public void updateUI () {

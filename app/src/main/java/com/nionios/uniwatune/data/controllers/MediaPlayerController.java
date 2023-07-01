@@ -1,15 +1,21 @@
 package com.nionios.uniwatune.data.controllers;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.IBinder;
 import android.view.View;
 
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
+
 import com.nionios.uniwatune.data.services.MediaPlayerService.MediaPlayerService;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
+import com.nionios.uniwatune.ui.player.PlayerViewModel;
 
 /**@description this is our media player controller. Ui communicates with this class
  * so this could communicate with the MediaPlayerService (This is middleware) */
@@ -50,11 +56,14 @@ public class MediaPlayerController {
                 MediaPlayerService.MediaPlayerServiceBinder serviceBinder =
                         (MediaPlayerService.MediaPlayerServiceBinder) iBinder ;
                 localMediaPlayerService = serviceBinder.getService();
+                // Initialize a MediaButtonsController to change the UI buttons appropriately
+                MediaButtonsController localMediaButtonsController = new MediaButtonsController();
                 // According to given command from previous methods, run diffent bound
                 // service method
                 switch (internalCommand) {
                     case TOGGLE_CURRENT_AUDIO_FILE_PLAY_STATE:
                         localMediaPlayerService.toggleMediaPlayerPlayState();
+                        localMediaButtonsController.togglePlayButtons(context);
                         break;
                     case PLAY_NEXT_AUDIO_FILE:
                         localMediaPlayerService.playNextAudioFile();
@@ -91,8 +100,8 @@ public class MediaPlayerController {
     /** File Path instead of serializing the whole object is used because Native Android serializing
      *  is slow and not needed in this case, we can find the object with its unique path anyway. */
     public void playSelectedAudioFile(View view, String filePath) {
+        Context context = view.getContext();
         /* Start the MediaPlayerControllerService and send the path as an extra*/
-        Context context = view.getContext().getApplicationContext();
         Intent serviceIntent = new Intent(context, MediaPlayerService.class);
         serviceIntent.putExtra("PATH", filePath);
         serviceIntent.setAction("com.uniwatune.action.PLAY");
