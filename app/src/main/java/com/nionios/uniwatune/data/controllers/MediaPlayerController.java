@@ -1,21 +1,15 @@
 package com.nionios.uniwatune.data.controllers;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.IBinder;
 import android.view.View;
 
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
-
 import com.nionios.uniwatune.data.services.MediaPlayerService.MediaPlayerService;
 import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
-import com.nionios.uniwatune.ui.player.PlayerViewModel;
 
 /**@description this is our media player controller. Ui communicates with this class
  * so this could communicate with the MediaPlayerService (This is middleware) */

@@ -29,7 +29,6 @@ import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
 public class PlayerFragment extends Fragment {
-
     private FragmentPlayerBinding binding;
 
     /* Handy function that handles the UI elements that signal the transition from an AudioFile to
@@ -67,6 +66,7 @@ public class PlayerFragment extends Fragment {
             @Override
             public void run() {
                 playerViewModel.updateSeekBar();
+                updateProgressOnSeekBar();
                 mHandler.postDelayed(this, 1000);
             }
         });
@@ -91,6 +91,15 @@ public class PlayerFragment extends Fragment {
         binding.duration.setText(timestampMaker.convertMillisecondsToTimestamp(fetchedDuration));
         // The seekbar's max is in milliseconds, set that normally
         seekbar.setMax(fetchedDuration);
+    }
+
+    private void updateProgressOnSeekBar () {
+        // Set the currrent progress of the song on the seekbar
+        SeekBar seekbar = binding.seekBar;
+        MediaPlayerStorage localMediaPlayerStorage = MediaPlayerStorage.getInstance();
+        MediaPlayer currentMediaPlayer = localMediaPlayerStorage.getMediaPlayer();
+        int fetchedCurrentPosition = currentMediaPlayer.getCurrentPosition();
+        seekbar.setProgress(fetchedCurrentPosition);
     }
 
     @SuppressLint("SetTextI18n")
