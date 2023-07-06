@@ -31,6 +31,20 @@ import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 public class PlayerFragment extends Fragment {
     private FragmentPlayerBinding binding;
 
+    private Handler seekBarHandler;
+    private PlayerFragment playerFragment = this;
+    private Runnable seekBarRunnable = new Runnable() {
+        @Override
+        public void run() {
+            PlayerViewModel playerViewModel =
+                    new ViewModelProvider(playerFragment).get(PlayerViewModel.class);
+            playerViewModel.updateSeekBar();
+            updateProgressOnSeekBar();
+            seekBarHandler.postDelayed(this, 1000);
+        }
+    };
+
+
     /* Handy function that handles the UI elements that signal the transition from an AudioFile to
      * another.*/
     private void changeAudioFileUISequence(
@@ -57,19 +71,14 @@ public class PlayerFragment extends Fragment {
         }, 400);
     }
 
+    private void stopSeekBarUpdateRunnable () {
+        seekBarHandler.removeCallbacks(seekBarRunnable);
+    }
+
     private void createSeekBarUpdateRunnable () {
-        Handler mHandler = new Handler();
-        PlayerViewModel playerViewModel =
-                new ViewModelProvider(this).get(PlayerViewModel.class);
+        seekBarHandler = new Handler();
         //Update seekbar every 1 second through the playerViewModel.
-        requireActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                playerViewModel.updateSeekBar();
-                updateProgressOnSeekBar();
-                mHandler.postDelayed(this, 1000);
-            }
-        });
+        requireActivity().runOnUiThread(seekBarRunnable);
     }
 
     private void initializeSeekBar() {
@@ -209,6 +218,7 @@ public class PlayerFragment extends Fragment {
             } else {
                 appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
                         R.drawable.baseline_pause_circle_24);
+                stopSeekBarUpdateRunnable();
             }
             binding.playerPlayButton.startAnimation(quickPulseAnimation);
             binding.playerPlayButton.setImageDrawable(appropriateDrawableOnClick);
@@ -293,9 +303,13 @@ public class PlayerFragment extends Fragment {
                 slideInLeftAnimation);
     }
 
+
+    /* Stop the seek bar runnable when view is destroyed to avoid getting illegal state exception
+       off accessing detached fragment method. */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        stopSeekBarUpdateRunnable();
         binding = null;
     }
 
