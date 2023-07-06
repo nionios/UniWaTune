@@ -23,7 +23,10 @@
         android:id="@+id/bottom_nav_view"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_gravity="bottom"
-        android:background="?attr/colorContainer"
-        app:menu="@menu/bottom_navigation" />
+        android:layout_gravity="bottom">
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/mini_player" />
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 </LinearLayout>

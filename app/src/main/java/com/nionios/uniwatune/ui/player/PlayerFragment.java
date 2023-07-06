@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
@@ -30,7 +31,6 @@ import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
 public class PlayerFragment extends Fragment {
     private FragmentPlayerBinding binding;
-
     private Handler seekBarHandler;
     private PlayerFragment playerFragment = this;
     private Runnable seekBarRunnable = new Runnable() {
@@ -152,6 +152,8 @@ public class PlayerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+        // When this fullscreen player is visible, hide mini player
+        getActivity().findViewById(R.id.bottom_nav_view).setVisibility(View.GONE);
         PlayerViewModel playerViewModel =
                 new ViewModelProvider(this).get(PlayerViewModel.class);
 
@@ -310,16 +312,20 @@ public class PlayerFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         stopSeekBarUpdateRunnable();
+        // When this fullscreen player is invisible, show mini player
+        View miniplayer = getActivity().findViewById(R.id.bottom_nav_view);
+        miniplayer.setVisibility(View.VISIBLE);
         binding = null;
     }
 
+    //TODO Does not work, needs to happen in a new activity
     /*
-    //TODO Does not work
     @Override
     public void onBackPressed(View view) {
         NavController navController =
                 Navigation.findNavController(view);
         navController.navigate(R.id.action_nav_player_to_nav_Player);
     }
+
      */
 }
