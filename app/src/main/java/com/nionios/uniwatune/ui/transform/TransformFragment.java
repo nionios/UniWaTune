@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
+import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.FragmentTransformBinding;
@@ -26,6 +28,7 @@ import com.nionios.uniwatune.databinding.ItemTransformBinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,7 +42,8 @@ public class TransformFragment extends Fragment {
     private FragmentTransformBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         // Get the view model from the source and inflate it
         TransformViewModel transformViewModel =
                 new ViewModelProvider(this).get(TransformViewModel.class);
@@ -189,7 +193,8 @@ public class TransformFragment extends Fragment {
             AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
             /* Get the file path of the clicked file and create and send controller to do the heavy
              *  lifting of communication with the MediaPlayerService */
-            String clickedFilePath = localAudioScannedInstance.getAudioFile(this.fileID).getPath();
+            AudioFile clickedAudioFile = localAudioScannedInstance.getAudioFile(this.fileID);
+            String clickedFilePath = clickedAudioFile.getPath();
             MediaPlayerController localMediaPlayerController = new MediaPlayerController();
             localMediaPlayerController.playSelectedAudioFile(
                     view,

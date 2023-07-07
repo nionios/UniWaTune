@@ -1,9 +1,16 @@
 package com.nionios.uniwatune;
 
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,20 +18,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
+import com.nionios.uniwatune.data.controllers.MediaPlayerController;
 import com.nionios.uniwatune.data.helpers.fileFinder;
+import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.ActivityMainBinding;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -65,20 +72,14 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.appBarMain.toolbar);
 
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
-        assert navHostFragment != null;
-        NavController navController = navHostFragment.getNavController();
-
-        NavigationView navigationView = binding.navView;
-        if (navigationView != null) {
-            mAppBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.nav_transform, R.id.nav_reflow, R.id.nav_player, R.id.nav_settings)
-                    .setOpenableLayout(binding.drawerLayout)
-                    .build();
-            NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-            NavigationUI.setupWithNavController(navigationView, navController);
+        LinkedList<AudioFile> currentAudioFileQueue = AudioQueueStorage.getInstance().getAudioQueue();
+        if (!currentAudioFileQueue.isEmpty()) {
+            AudioFile currentAudioFile = currentAudioFileQueue.peek();
+            TextView miniplayerTitleTextView = (TextView) findViewById(R.id.miniplayer_title_text_view);
+            miniplayerTitleTextView.setText(currentAudioFile.getName());
+            TextView miniplayerArtistTextView = (TextView) findViewById(R.id.miniplayer_artist_text_view);
+            miniplayerArtistTextView.setText(currentAudioFile.getArtist());
         }
-
     }
 
     @Override
@@ -92,7 +93,88 @@ public class MainActivity extends AppCompatActivity {
             // We only inflate the overflow menu if the navigation drawer isn't visible
             getMenuInflater().inflate(R.menu.overflow, menu);
         }
+
+        // Populate the miniplayer if a song is playing with info from current song
+        LinkedList<AudioFile> currentAudioFileQueue = AudioQueueStorage.getInstance().getAudioQueue();
+        if (!currentAudioFileQueue.isEmpty()) {
+            AudioFile currentAudioFile = currentAudioFileQueue.peek();
+            TextView miniplayerTitleTextView = (TextView) findViewById(R.id.miniplayer_title_text_view);
+            miniplayerTitleTextView.setText(currentAudioFile.getName());
+            TextView miniplayerArtistTextView = (TextView) findViewById(R.id.miniplayer_artist_text_view);
+            miniplayerArtistTextView.setText(currentAudioFile.getArtist());
+            ImageView miniplayerAlbumImageView = (ImageView) findViewById(R.id.miniplayer_album_image);
+            miniplayerAlbumImageView.setImageBitmap(currentAudioFile.getAlbumArt());
+
+            miniplayerTitleTextView.setSelected(true);
+            miniplayerArtistTextView.setSelected(true);
+            // Create a controller object and see if song is playing currently
+            // According to the state of the song (playing/not) set the appropriate drawable.
+            // This is on initial viewing of the player
+            MediaPlayerController localMediaPlayerController = new MediaPlayerController();
+            Drawable appropriateDrawableInitial;
+            if (localMediaPlayerController.isAudioPlaying()) {
+                appropriateDrawableInitial = ContextCompat.getDrawable(getApplicationContext(),
+                        R.drawable.baseline_pause_circle_24);
+            } else {
+                appropriateDrawableInitial = ContextCompat.getDrawable(getApplicationContext(),
+                        R.drawable.baseline_play_circle_24);
+            }
+            ImageButton miniplayerImageButton = findViewById(R.id.miniplayer_play_button);
+            miniplayerImageButton.setImageDrawable(appropriateDrawableInitial);
+            // Initializing quickpulse animation for some buttons
+            Animation quickPulseAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.quickpulse);
+            // Signal the service to start/stop the song on click.
+            // According to the state of the song (playing/not) set the appropriate drawable again.
+            // This is on click of playerPlayButton on player
+            miniplayerImageButton.setOnClickListener(view -> {
+                localMediaPlayerController.toggleCurrentlyPlayingAudioFilePlayState(getApplicationContext());
+                // According to the state of the song (playing/not) set the appropriate drawable.
+                Drawable appropriateDrawableOnClick;
+                if (localMediaPlayerController.isAudioPlaying()) {
+                    appropriateDrawableOnClick = ContextCompat.getDrawable(getApplicationContext(),
+                            R.drawable.baseline_play_circle_24);
+                } else {
+                    appropriateDrawableOnClick = ContextCompat.getDrawable(getApplicationContext(),
+                            R.drawable.baseline_pause_circle_24);
+                }
+                miniplayerImageButton.startAnimation(quickPulseAnimation);
+                miniplayerImageButton.setImageDrawable(appropriateDrawableOnClick);
+            });
+
+            ImageButton miniplayerNextButton = findViewById(R.id.miniplayer_next_button);
+            ImageButton miniplayerPreviousButton = findViewById(R.id.miniplayer_previous_button);
+
+            // Click listeners on both the previous and the next audio file buttons.
+            miniplayerNextButton.setOnClickListener(view -> {
+                localMediaPlayerController.playNextAudioFile(getApplicationContext());
+                playNextAudioFileAnimations();
+            });
+
+            miniplayerPreviousButton.setOnClickListener(view -> {
+                localMediaPlayerController.playPreviousAudioFile(getApplicationContext());
+                playPreviousAudioFileAnimations();
+            });
+        }
+
         return result;
+    }
+
+    public void playNextAudioFileAnimations() {
+        Animation slideOutLeftAnimation = AnimationUtils.loadAnimation(
+                getApplicationContext(),
+                R.anim.slide_out_left);
+        Animation slideInRightAnimation = AnimationUtils.loadAnimation(
+                getApplicationContext(),
+                R.anim.slide_in_right);
+    }
+
+    public void playPreviousAudioFileAnimations() {
+        Animation slideOutRightAnimation = AnimationUtils.loadAnimation(
+                getApplicationContext(),
+                android.R.anim.slide_out_right);
+        Animation slideInLeftAnimation = AnimationUtils.loadAnimation(
+                getApplicationContext(),
+                android.R.anim.slide_in_left);
     }
 
     @Override

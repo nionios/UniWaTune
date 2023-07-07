@@ -66,7 +66,6 @@ public class PlayerFragment extends Fragment {
         binding.playerAlbumCoverImageView.startAnimation(previousAudioFileAnimation);
         initializeSeekBar();
         view.postDelayed(() -> {
-           // playerViewModel.updateUI();
             binding.playerAlbumCoverImageView.startAnimation(nextAudioFileAnimation);
         }, 400);
     }
@@ -153,7 +152,7 @@ public class PlayerFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // When this fullscreen player is visible, hide mini player
-        getActivity().findViewById(R.id.bottom_nav_view).setVisibility(View.GONE);
+        requireActivity().findViewById(R.id.bottom_nav_view).setVisibility(View.GONE);
         PlayerViewModel playerViewModel =
                 new ViewModelProvider(this).get(PlayerViewModel.class);
 
@@ -313,7 +312,7 @@ public class PlayerFragment extends Fragment {
         super.onDestroyView();
         stopSeekBarUpdateRunnable();
         // When this fullscreen player is invisible, show mini player
-        View miniplayer = getActivity().findViewById(R.id.bottom_nav_view);
+        View miniplayer = requireActivity().findViewById(R.id.bottom_nav_view);
         miniplayer.setVisibility(View.VISIBLE);
         binding = null;
     }

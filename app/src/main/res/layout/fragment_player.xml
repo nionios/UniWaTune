@@ -237,10 +237,10 @@
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/player_loop_button"
         app:layout_constraintEnd_toStartOf="@+id/player_play_button"
-        app:layout_constraintHorizontal_bias="0.186"
+        app:layout_constraintHorizontal_bias="0.124"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seekBar"
-        app:layout_constraintVertical_bias="0.228" />
+        app:layout_constraintVertical_bias="0.142" />
 
     <TextView
         android:id="@+id/duration"
@@ -254,6 +254,6 @@
         app:layout_constraintHorizontal_bias="0.794"
         app:layout_constraintStart_toEndOf="@+id/player_next_button"
         app:layout_constraintTop_toBottomOf="@+id/seekBar"
-        app:layout_constraintVertical_bias="0.184" />
+        app:layout_constraintVertical_bias="0.131" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

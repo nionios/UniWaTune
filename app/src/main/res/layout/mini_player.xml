@@ -9,7 +9,7 @@
 
     <ImageButton
         android:id="@+id/miniplayer_play_button"
-        android:layout_width="70dp"
+        android:layout_width="68dp"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
@@ -20,34 +20,38 @@
         android:scaleType="fitCenter"
         android:src="@drawable/baseline_pause_circle_24"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/miniplayer_next_button"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/miniplayer_previous_button"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_bias="0.0"
         app:tint="?attr/colorPrimary" />
 
     <ImageButton
         android:id="@+id/miniplayer_previous_button"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
+        android:layout_width="60dp"
+        android:layout_height="62dp"
         android:background="@android:color/transparent"
         android:minWidth="0pt"
         android:padding="0pt"
         android:scaleType="fitCenter"
         android:src="@drawable/baseline_skip_previous_24"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/miniplayer_play_button"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/miniplayer_title_text_view"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         app:tint="?attr/colorPrimary" />
 
     <ImageButton
         android:id="@+id/miniplayer_next_button"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
+        android:layout_width="60dp"
+        android:layout_height="62dp"
         android:background="@android:color/transparent"
         android:minWidth="0pt"
         android:padding="0pt"
@@ -55,8 +59,9 @@
         android:src="@drawable/baseline_skip_next_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/miniplayer_play_button"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         app:tint="?attr/colorPrimary" />
@@ -65,9 +70,11 @@
         android:id="@+id/miniplayer_album_image"
         android:layout_width="64dp"
         android:layout_height="fill_parent"
-        android:src="@mipmap/ic_launcher"
         android:outlineProvider="none"
+        android:src="@mipmap/ic_launcher"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/miniplayer_title_text_view"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -75,8 +82,8 @@
 
     <TextView
         android:id="@+id/miniplayer_title_text_view"
-        android:layout_width="146dp"
-        android:layout_height="17dp"
+        android:layout_width="122dp"
+        android:layout_height="19dp"
         android:text="No song playing!"
         android:textSize="14sp"
         android:textStyle="bold"
@@ -89,8 +96,8 @@
 
     <TextView
         android:id="@+id/miniplayer_artist_text_view"
-        android:layout_width="146dp"
-        android:layout_height="14dp"
+        android:layout_width="120dp"
+        android:layout_height="15dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/miniplayer_previous_button"
@@ -98,5 +105,19 @@
         app:layout_constraintStart_toEndOf="@+id/miniplayer_album_image"
         app:layout_constraintTop_toBottomOf="@+id/miniplayer_title_text_view"
         app:layout_constraintVertical_bias="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="-25dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
