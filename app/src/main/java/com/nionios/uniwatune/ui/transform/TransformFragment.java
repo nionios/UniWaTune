@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
-import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.AudioScanned;
 import com.nionios.uniwatune.data.types.AudioFile;
 import com.nionios.uniwatune.databinding.FragmentTransformBinding;
@@ -28,7 +26,6 @@ import com.nionios.uniwatune.databinding.ItemTransformBinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
