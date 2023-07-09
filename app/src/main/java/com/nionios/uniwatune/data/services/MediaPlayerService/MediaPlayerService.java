@@ -71,7 +71,7 @@ public class MediaPlayerService
 
     public LinkedList<AudioFile> trimQueue (LinkedList<AudioFile> inputQueue, String filePath) {
         while (inputQueue.iterator().hasNext()) {
-            assert inputQueue.peek() != null;
+            //assert inputQueue.peek() != null;
             if (inputQueue.peek().getPath().compareTo(filePath) != 0) {
                 // Remove head element from queue
                 inputQueue.poll();
@@ -133,28 +133,29 @@ public class MediaPlayerService
          * set this one as current. Also set the song as currently loaded on
          * our MediaPlayer*/
         setMediaPlayer(localMediaPlayer);
-        // Get AudioScanned singleton instance so we are able to search for the file
-        AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
-        ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
-        // The first (an only) match is our instantiated object on memory
-        // TODO: set it as current song with setCurrentAudioFile or just front of queue?
-                    /*List<AudioFile> tempRetrievedCurrentAudioFiles = localAudioFileList.stream()
-                            .filter(file -> Objects.equals(file.getPath(), inputAudioFilePath))
-                            .collect(Collectors.toList());
-                    setCurrentAudioFile(tempRetrievedCurrentAudioFiles.get(0));*/
-        // Cut off the queue up to the current audio file (no previous songs)
-        LinkedList<AudioFile> NewQueue = new LinkedList<>(localAudioFileList);
-        NewQueue = trimQueue(NewQueue, inputAudioFilePath);
-        // Get the queue storage singleton and store the queue there.
+        // Get the queue storage singleton to store the queue there and check if queue is shuffled.
         AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
-        switch (mode) {
-            case SET_QUEUE_ONLY_FLAG:
-                localAudioQueueStorage.setAudioQueue(NewQueue);
-                break;
-            case SET_BOTH_QUEUE_AND_SHADOW_QUEUE_FLAG:
-            default:
-                localAudioQueueStorage.setAudioAndShadowQueue(NewQueue);
-                break;
+        // Don't touch queue if it is shuffled.
+        if (!localAudioQueueStorage.isQueueShuffled()) {
+            // Get AudioScanned singleton instance so we are able to search for the file
+            AudioScanned localAudioScannedInstance = AudioScanned.getInstance();
+            ArrayList<AudioFile> localAudioFileList = localAudioScannedInstance.getAudioFileList();
+            // Trim the played file from the queue
+            LinkedList<AudioFile> NewQueue = new LinkedList<>(localAudioFileList);
+            NewQueue = trimQueue(NewQueue, inputAudioFilePath);
+            switch (mode) {
+                case SET_QUEUE_ONLY_FLAG:
+                    localAudioQueueStorage.setAudioQueue(NewQueue);
+                    break;
+                case SET_BOTH_QUEUE_AND_SHADOW_QUEUE_FLAG:
+                default:
+                    localAudioQueueStorage.setAudioAndShadowQueue(NewQueue);
+                    break;
+            }
+        } else {
+            // If queue is shuffled, then just remove first element of queue.
+            LinkedList<AudioFile> NewQueue = new LinkedList<>(localAudioQueueStorage.getAudioQueue());
+            localAudioQueueStorage.setAudioQueue(NewQueue);
         }
         localAudioQueueStorage.setIsQueueActive(true);
         localMediaPlayer.setLooping(false);

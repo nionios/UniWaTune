@@ -1,6 +1,7 @@
 package com.nionios.uniwatune.ui.player;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import androidx.navigation.NavController;
 import com.nionios.uniwatune.R;
 import com.nionios.uniwatune.data.controllers.MediaPlayerController;
 import com.nionios.uniwatune.data.helpers.TimestampMaker;
+import com.nionios.uniwatune.data.singletons.AudioQueueStorage;
 import com.nionios.uniwatune.data.singletons.MediaPlayerStorage;
 import com.nionios.uniwatune.databinding.FragmentPlayerBinding;
 
@@ -55,7 +57,7 @@ public class PlayerFragment extends Fragment {
         // Initialize our pulse animation
         Animation pulseAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.pulse);
         // As audio starts playing, make the play button reflect that (switch to click to pause)
-        Drawable pauseCircleButton = ContextCompat.getDrawable(requireContext(),
+        Drawable pauseCircleButton = ContextCompat.getDrawable(getContext(),
                 R.drawable.baseline_pause_circle_24);
         // Get our playerViewModel provider to signal change of UI infos
         PlayerViewModel playerViewModel =
@@ -159,6 +161,7 @@ public class PlayerFragment extends Fragment {
         binding = FragmentPlayerBinding.inflate(inflater, container, false);
 
         View root = binding.getRoot();
+        Context context = requireContext();
 
         final TextView playerTitleTextView = binding.playerTitleTextView;
         playerViewModel.getMutableAudioFileTitle().observe(
@@ -194,15 +197,28 @@ public class PlayerFragment extends Fragment {
         // According to the state of the song (playing/not) set the appropriate drawable.
         // This is on initial viewing of the player
         MediaPlayerController localMediaPlayerController = new MediaPlayerController();
-        Drawable appropriateDrawableInitial;
+        Drawable appropriateDrawableInitialToggleButton;
         if (localMediaPlayerController.isAudioPlaying()) {
-            appropriateDrawableInitial = ContextCompat.getDrawable(requireContext(),
+            appropriateDrawableInitialToggleButton = ContextCompat.getDrawable(context,
                     R.drawable.baseline_pause_circle_24);
         } else {
-            appropriateDrawableInitial = ContextCompat.getDrawable(requireContext(),
+            appropriateDrawableInitialToggleButton = ContextCompat.getDrawable(context,
                     R.drawable.baseline_play_circle_24);
         }
-        binding.playerPlayButton.setImageDrawable(appropriateDrawableInitial);
+        binding.playerPlayButton.setImageDrawable(appropriateDrawableInitialToggleButton);
+        
+        AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
+        // See if queue is shuffled too to set the shuffle drawable
+        Drawable appropriateDrawableInitialShuffleButton;
+        if (localAudioQueueStorage.isQueueShuffled()) {
+
+            appropriateDrawableInitialShuffleButton = ContextCompat.getDrawable(context,
+                    R.drawable.baseline_shuffle_on_24);
+        } else {
+            appropriateDrawableInitialShuffleButton = ContextCompat.getDrawable(context,
+                    R.drawable.baseline_shuffle_24);
+        }
+        binding.playerShuffleButton.setImageDrawable(appropriateDrawableInitialShuffleButton);
         // Initializing quickpulse animation for some buttons
         Animation quickPulseAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.quickpulse);
         // Signal the service to start/stop the song on click.
@@ -213,10 +229,10 @@ public class PlayerFragment extends Fragment {
             // According to the state of the song (playing/not) set the appropriate drawable.
             Drawable appropriateDrawableOnClick;
             if (localMediaPlayerController.isAudioPlaying()) {
-                appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
+                appropriateDrawableOnClick = ContextCompat.getDrawable(context,
                         R.drawable.baseline_play_circle_24);
             } else {
-                appropriateDrawableOnClick = ContextCompat.getDrawable(requireContext(),
+                appropriateDrawableOnClick = ContextCompat.getDrawable(context,
                         R.drawable.baseline_pause_circle_24);
                 stopSeekBarUpdateRunnable();
             }
@@ -233,6 +249,22 @@ public class PlayerFragment extends Fragment {
         binding.playerPreviousButton.setOnClickListener(view -> {
             localMediaPlayerController.playPreviousAudioFile(getContext());
             playPreviousAudioFileAnimations();
+        });
+
+        binding.playerShuffleButton.setOnClickListener(view -> {
+            // According to the state of the queue (shuffled/not) set the appropriate drawable.
+            Drawable appropriateDrawableOnClick;
+            if (localAudioQueueStorage.isQueueShuffled()) {
+                localAudioQueueStorage.unshuffle();
+                appropriateDrawableOnClick = ContextCompat.getDrawable(context,
+                        R.drawable.baseline_shuffle_24);
+            } else {
+                localAudioQueueStorage.shuffle();
+                appropriateDrawableOnClick = ContextCompat.getDrawable(context,
+                        R.drawable.baseline_shuffle_on_24);
+            }
+            binding.playerShuffleButton.startAnimation(quickPulseAnimation);
+            binding.playerShuffleButton.setImageDrawable(appropriateDrawableOnClick);
         });
 
         // TODO: revisit this, does not work at all.
