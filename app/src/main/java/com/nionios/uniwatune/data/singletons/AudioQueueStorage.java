@@ -26,7 +26,7 @@ public class AudioQueueStorage {
     // If isQueueActive is true, then the song on index 0 is currently playing
     private boolean isQueueActive;
     private boolean isQueueShuffled = false;
-
+    private boolean isQueueLooped = false;
 
     public static AudioQueueStorage getInstance() {
         if(AUDIO_QUEUE_INSTANCE == null) {
@@ -72,10 +72,21 @@ public class AudioQueueStorage {
         isQueueShuffled = false;
     }
 
+    public void loop () {
+        isQueueLooped = true;
+    }
+
+    public void unloop () {
+        isQueueLooped = false;
+    }
+
     public boolean isQueueShuffled () {
         return isQueueShuffled;
     }
 
+    public boolean isQueueLooped () {
+        return isQueueLooped;
+    }
     public void addToAudioQueue (AudioFile inputAudioFile) {
         AudioQueue.add(inputAudioFile);
     }

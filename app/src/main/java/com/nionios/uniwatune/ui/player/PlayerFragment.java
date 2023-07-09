@@ -208,7 +208,7 @@ public class PlayerFragment extends Fragment {
         binding.playerPlayButton.setImageDrawable(appropriateDrawableInitialToggleButton);
         
         AudioQueueStorage localAudioQueueStorage = AudioQueueStorage.getInstance();
-        // See if queue is shuffled too to set the shuffle drawable
+        // See if queue is shuffled, to set the shuffle drawable
         Drawable appropriateDrawableInitialShuffleButton;
         if (localAudioQueueStorage.isQueueShuffled()) {
 
@@ -219,6 +219,20 @@ public class PlayerFragment extends Fragment {
                     R.drawable.baseline_shuffle_24);
         }
         binding.playerShuffleButton.setImageDrawable(appropriateDrawableInitialShuffleButton);
+
+
+        // See if queue is looped too, to set the loop drawable
+        Drawable appropriateDrawableInitialLoopButton;
+        if (localAudioQueueStorage.isQueueLooped()) {
+            appropriateDrawableInitialLoopButton = ContextCompat.getDrawable(context,
+                    R.drawable.baseline_repeat_on_24);
+        } else {
+            appropriateDrawableInitialLoopButton = ContextCompat.getDrawable(context,
+                    R.drawable.baseline_repeat_24);
+        }
+        binding.playerLoopButton.setImageDrawable(appropriateDrawableInitialLoopButton);
+
+
         // Initializing quickpulse animation for some buttons
         Animation quickPulseAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.quickpulse);
         // Signal the service to start/stop the song on click.
@@ -265,6 +279,23 @@ public class PlayerFragment extends Fragment {
             }
             binding.playerShuffleButton.startAnimation(quickPulseAnimation);
             binding.playerShuffleButton.setImageDrawable(appropriateDrawableOnClick);
+        });
+
+
+        binding.playerLoopButton.setOnClickListener(view -> {
+            // According to the state of the queue (shuffled/not) set the appropriate drawable.
+            Drawable appropriateDrawableOnClick;
+            if (localAudioQueueStorage.isQueueLooped()) {
+                localAudioQueueStorage.unloop();
+                appropriateDrawableOnClick = ContextCompat.getDrawable(context,
+                        R.drawable.baseline_repeat_24);
+            } else {
+                localAudioQueueStorage.loop();
+                appropriateDrawableOnClick = ContextCompat.getDrawable(context,
+                        R.drawable.baseline_repeat_on_24);
+            }
+            binding.playerLoopButton.startAnimation(quickPulseAnimation);
+            binding.playerLoopButton.setImageDrawable(appropriateDrawableOnClick);
         });
 
         // TODO: revisit this, does not work at all.

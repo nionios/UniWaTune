@@ -158,7 +158,11 @@ public class MediaPlayerService
             localAudioQueueStorage.setAudioQueue(NewQueue);
         }
         localAudioQueueStorage.setIsQueueActive(true);
-        localMediaPlayer.setLooping(false);
+        if (localAudioQueueStorage.isQueueLooped()) {
+            localMediaPlayer.setLooping(true);
+        } else {
+            localMediaPlayer.setLooping(false);
+        }
         // Start the media player finally
         localMediaPlayer.start();
         localMediaPlayer.setOnCompletionListener(this);
