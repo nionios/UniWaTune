@@ -1,5 +1,6 @@
 package com.nionios.uniwatune;
 
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         // Set the main theme again from the splash screen theme
         setTheme(R.style.Theme_UniWaTune);
         super.onCreate(savedInstanceState);
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Check for READ permission on storage
         if (ContextCompat.checkSelfPermission(this,
@@ -66,15 +70,21 @@ public class MainActivity extends AppCompatActivity {
         // Store it in out singleton with the scanned audio files
         audioScannedMainActInstance.setAudioFileList(localAudioFileList);
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
         setSupportActionBar(binding.appBarMain.toolbar);
 
         LinkedList<AudioFile> currentAudioFileQueue = AudioQueueStorage.getInstance().getAudioQueue();
         if (!currentAudioFileQueue.isEmpty()) {
             refreshMiniplayerInfo(currentAudioFileQueue);
         }
+
+        // Get the nav host fragment
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        assert navHostFragment != null;
+        NavController navController = navHostFragment.getNavController();
+        // If user clicks on background of miniplayer, then nav to fullscreen player
+        findViewById(R.id.bottom_nav_view).setOnClickListener(view -> {
+            navController.navigate(R.id.action_nav_transform_to_nav_player);
+        });
     }
 
     public void refreshMiniplayerInfo (LinkedList<AudioFile> currentAudioFileQueue) {
@@ -153,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 localMediaPlayerController.playPreviousAudioFile(getApplicationContext());
                 playPreviousAudioFileAnimations();
             });
+
         }
 
         return result;

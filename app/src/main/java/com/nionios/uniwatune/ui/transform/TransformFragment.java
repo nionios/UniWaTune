@@ -197,9 +197,7 @@ public class TransformFragment extends Fragment {
                     view,
                     clickedFilePath
             );
-            //TODO: does not work, crashes on null obj reference
             // Set miniplayer visibility to 0 when transitioning into the full screen player
-            //view.findViewById(R.id.bottom_nav_view).setVisibility(View.GONE);
             NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_nav_transform_to_nav_player);
         }

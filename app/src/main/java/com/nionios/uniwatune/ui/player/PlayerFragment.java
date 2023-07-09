@@ -187,7 +187,6 @@ public class PlayerFragment extends Fragment {
         );
 
         // Make text scroll when it overflows
-        //FIXME: only works on unlock phone
         playerTitleTextView.setSelected(true);
         playerAlbumTextView.setSelected(true);
         playerArtistTextView.setSelected(true);
